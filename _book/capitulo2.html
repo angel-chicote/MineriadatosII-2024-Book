@@ -2007,6 +2007,12 @@ uplift_i = P[Y_i \mid T_i = 1, W_i = w] - P[Y_i \mid T_i = 0, W_i = w]
 <span id="cb56-8"><a href="#cb56-8"></a>plt.xlabel(<span class="st">'Individual Treatment Effect (ITE/CATE)'</span>)</span>
 <span id="cb56-9"><a href="#cb56-9"></a>plt.ylabel(<span class="st">'# of Samples'</span>)</span>
 <span id="cb56-10"><a href="#cb56-10"></a>_<span class="op">=</span>plt.legend()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="imagenes/capitulo2/inferencia_causal/distribucion_cate.png" class="img-fluid figure-img"></p>
+<figcaption>Curva Uplift</figcaption>
+</figure>
+</div>
 <p>En la gráfica anterior vemos como está estimando correctamente el CATE. Y si quisiesemos obtener la curva uplift:</p>
 <div class="sourceCode" id="cb57"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb57-1"><a href="#cb57-1"></a>plot(cate[[<span class="st">"CATE"</span>, <span class="st">"CATE real"</span>, <span class="st">"tau"</span>, <span class="st">"y"</span>, <span class="st">"w"</span>]], outcome_col<span class="op">=</span><span class="st">'y'</span>, treatment_col<span class="op">=</span><span class="st">'w'</span>, treatment_effect_col<span class="op">=</span><span class="st">'tau'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="quarto-figure quarto-figure-center">
