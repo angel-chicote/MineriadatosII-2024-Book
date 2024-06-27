@@ -608,6 +608,8 @@ cate = pd.DataFrame({"CATE_banda_inferior":cate_s_lb, "CATE": cate_s, "CATE_band
 cate.head()
 ```
 
+![Estimacion CATE](imagenes/capitulo2/inferencia_causal/tabla_cate.png)
+
 ``` python
 alpha=0.2
 bins=30
