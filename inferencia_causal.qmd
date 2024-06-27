@@ -191,16 +191,7 @@ Entonces, "ir al hospital" está reflejando no solamente la atención médica re
 
 Gráficamente, sería algo así:
 
-``` python
-
-#Especificamos engine='neato' para poder usar argumento `pos` en nodos
-dot = Digraph(engine='neato')
-dot.node('T', 'Hospital', pos='1,1!')
-dot.node('Y', 'Estado de salud', pos='3,1!')
-dot.node('X', 'Condición de salud previa', pos='2,2!')
-dot.edges(['TY', 'XY', 'XT'])
-dot
-```
+![Grafo causal](imagenes/capitulo2/inferencia_causal/grafo.png)
 
 ### Confusores y sesgos
 
@@ -357,6 +348,9 @@ sns.scatterplot(data=data, x="edad", y="fumar", hue = "fumar", ax=axs[1, 2])
 plt.show()
 ```
 
+![Análisis exploratorio](imagenes/capitulo2/inferencia_causal/scaterplor.png)
+
+
 A simple vista, podemos ver 3 patrones:
 - Los fumadores suelen ser jóvenes.
 - Los jóvenes tienen mejor salud.
@@ -375,6 +369,8 @@ reg = LinearRegression().fit(X, y)
 print(f"Valor estimado de beta_1 (efecto de fumar): {reg.coef_[0]}")
 ```
 
+> Valor estimado de beta_1 (efecto de fumar): 5.556894920031017
+
 Con nuestro modelo no identificamos bien el efecto causal: el $\beta_1$ estimado es 5,5. Pareciera que fumar es bueno para la salud y como conocemos el modelo verdadero, sabemos que no es así. ¿Cómo se explica que el efecto de fumar en la salud parezca positivo?
 
 - _Modelo "bien especificado"_. Se nos ocurre estimar una regresión lineal incluyendo edad como covariable. Es decir, el siguiente modelo: $$salud_i = \beta_0 + \beta_1  \; fumar_i + \beta_2  \; edad_i +  u_i$$
@@ -387,6 +383,9 @@ reg = LinearRegression().fit(X, y)
 print(f"Valor estimado de beta_1 (efecto de fumar)  : {reg.coef_[0]}")
 print(f"Valor estimado de beta_2 (efecto de la edad): {reg.coef_[1]}")
 ```
+
+> Valor estimado de beta_1 (efecto de fumar)  : -9.978120034464466
+> Valor estimado de beta_2 (efecto de la edad): -0.9999012930995471
 
 En este caso hemos obtenido una estimación del efecto de fumar muy acertada. Lo que estaba ocurriendo era que la edad era una variable de confusión y no podiamos estimar el efecto de fumar. Ahora que hemos controlado por la edad, hemos capturado correctamente el efecto de fumar.
 
@@ -403,6 +402,9 @@ data["salud_exp"] = 100 - 10 * data.fumar_exp  - data.edad + np.random.normal(si
 sns.histplot(data=data, x="edad",  hue="fumar_exp").set_title("Distribución de la edad por fumar")
 ```
 
+
+![Distribución edad](imagenes/capitulo2/inferencia_causal/distribucion_edad.png)
+
 Como podemos observar, al elegir aleatoriamente a los individuos entre fumadores y no fumadores, ambos grupos poseen unas edades similares, por lo que ahora, la edad no tendrá correlación con la variable fumar.
 
 ``` python
@@ -412,6 +414,8 @@ y = data['salud_exp']
 reg = LinearRegression().fit(X, y)
 print(f"Valor estimado de beta_1 (efecto de fumar_exp)  : {reg.coef_[0]}")
 ```
+
+> Valor estimado de beta_1 (efecto de fumar_exp)  : -9.926418032387838
 
 _Volvimos a recuperar el efecto causal_ usando unicamente la variable fumar en nuestro modelo, ya que pudimos controlar el efecto de la edad.
 
@@ -562,6 +566,9 @@ print(f"Maximo valor de uplift:{diferencia_por_individuo.max()}")
 print(f"Minimo valor de uplift:{diferencia_por_individuo.min()}")
 ```
 
+> Maximo valor de uplift:-9.978120034464453
+> Minimo valor de uplift:-9.978120034464467
+
 ¿Qué es lo que está ocurriendo aqui?
 Pues que en la regresión logistica, el efecto de fumar es el mismo para todos los sujetos $\hat{\beta_1} = -9.978$, y por tanto, la estimación del CATE, también será de $-9.978$. Este no es un método útil para calcular uplifts.
 
@@ -591,6 +598,11 @@ print(f"Estimacion del ATE (banda superior): {ate_s_ub}")
 print(f"Estimacion del ATE: {ate_s}")
 print(f"Estimacion del ATE (banda inferior): {ate_s_lb}")
 ```
+> Estimacion del ATE (banda superior): [0.5563531]
+
+> Estimacion del ATE: [0.53164181]
+
+> Estimacion del ATE (banda inferior): [0.50693052]
 
 De este modo, rapidamente hemos obtenido una estimación del $ATE$ sin necesidad de hacer pasos intermedios. Ahora vamos a calcular una estimación del CATE:
 
@@ -623,7 +635,7 @@ plt.ylabel('# of Samples')
 _=plt.legend()
 ```
 
-![Curva Uplift](imagenes/capitulo2/inferencia_causal/distribucion_cate.png)
+![Distribución CATE](imagenes/capitulo2/inferencia_causal/distribucion_cate.png)
 
 En la gráfica anterior vemos como está estimando correctamente el CATE. Y si quisiesemos obtener la curva uplift:
 
