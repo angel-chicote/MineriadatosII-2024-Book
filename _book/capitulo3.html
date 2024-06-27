@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Módulo 8. Minería de Datos II - 3&nbsp; Algoritmos Genéticos</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./capitulo4.html" rel="next">
+<link href="./capitulo2.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-sidebar floating">% Para el pseudocodigo
+<script>
+MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./capitulo3.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Módulo 8. Minería de Datos II</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introducción</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Deep Learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo3.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introducción" id="toc-introducción" class="nav-link active" data-scroll-target="#introducción"><span class="header-section-number">3.1</span> Introducción</a></li>
+  <li><a href="#fundamentos-teóricos" id="toc-fundamentos-teóricos" class="nav-link" data-scroll-target="#fundamentos-teóricos"><span class="header-section-number">3.2</span> Fundamentos teóricos</a>
+  <ul class="collapse">
+  <li><a href="#codificación-de-los-datos" id="toc-codificación-de-los-datos" class="nav-link" data-scroll-target="#codificación-de-los-datos"><span class="header-section-number">3.2.1</span> Codificación de los datos</a></li>
+  <li><a href="#algoritmo" id="toc-algoritmo" class="nav-link" data-scroll-target="#algoritmo"><span class="header-section-number">3.2.2</span> Algoritmo</a></li>
+  <li><a href="#otros-operadores" id="toc-otros-operadores" class="nav-link" data-scroll-target="#otros-operadores"><span class="header-section-number">3.2.3</span> Otros Operadores</a></li>
+  <li><a href="#parámetros-necesarios-al-aplicar-algoritmos-genéticos" id="toc-parámetros-necesarios-al-aplicar-algoritmos-genéticos" class="nav-link" data-scroll-target="#parámetros-necesarios-al-aplicar-algoritmos-genéticos"><span class="header-section-number">3.2.4</span> Parámetros necesarios al aplicar Algoritmos Genéticos</a></li>
+  </ul></li>
+  <li><a href="#casos-de-uso" id="toc-casos-de-uso" class="nav-link" data-scroll-target="#casos-de-uso"><span class="header-section-number">3.3</span> Casos de uso</a>
+  <ul class="collapse">
+  <li><a href="#selección-de-variable" id="toc-selección-de-variable" class="nav-link" data-scroll-target="#selección-de-variable"><span class="header-section-number">3.3.1</span> Selección de Variable</a></li>
+  <li><a href="#entrenamiento-de-red-neuronal" id="toc-entrenamiento-de-red-neuronal" class="nav-link" data-scroll-target="#entrenamiento-de-red-neuronal"><span class="header-section-number">3.3.2</span> Entrenamiento de Red Neuronal</a></li>
+  <li><a href="#arquitecura-de-redneuronal" id="toc-arquitecura-de-redneuronal" class="nav-link" data-scroll-target="#arquitecura-de-redneuronal"><span class="header-section-number">3.3.3</span> Arquitecura de RedNeuronal</a></li>
+  </ul></li>
+  <li><a href="#algoritmos-genéticos-con-r" id="toc-algoritmos-genéticos-con-r" class="nav-link" data-scroll-target="#algoritmos-genéticos-con-r"><span class="header-section-number">3.4</span> Algoritmos genéticos con R</a>
+  <ul class="collapse">
+  <li><a href="#paquetes-para-usar-en-r" id="toc-paquetes-para-usar-en-r" class="nav-link" data-scroll-target="#paquetes-para-usar-en-r"><span class="header-section-number">3.4.1</span> Paquetes para usar en R</a></li>
+  <li><a href="#selección-de-variables" id="toc-selección-de-variables" class="nav-link" data-scroll-target="#selección-de-variables"><span class="header-section-number">3.4.2</span> Selección de variables</a></li>
+  <li><a href="#entrenamiento-de-red-neuronal-1" id="toc-entrenamiento-de-red-neuronal-1" class="nav-link" data-scroll-target="#entrenamiento-de-red-neuronal-1"><span class="header-section-number">3.4.3</span> Entrenamiento de Red Neuronal</a></li>
+  </ul></li>
+  <li><a href="#algoritmos-genéticos-en-python" id="toc-algoritmos-genéticos-en-python" class="nav-link" data-scroll-target="#algoritmos-genéticos-en-python"><span class="header-section-number">3.5</span> Algoritmos genéticos en Python</a>
+  <ul class="collapse">
+  <li><a href="#paquetes-para-usar-en-python" id="toc-paquetes-para-usar-en-python" class="nav-link" data-scroll-target="#paquetes-para-usar-en-python"><span class="header-section-number">3.5.1</span> Paquetes para usar en Python</a></li>
+  <li><a href="#optimiación-de-funciones" id="toc-optimiación-de-funciones" class="nav-link" data-scroll-target="#optimiación-de-funciones"><span class="header-section-number">3.5.2</span> Optimiación de funciones</a></li>
+  <li><a href="#entrenamiento-de-red-neuronal-2" id="toc-entrenamiento-de-red-neuronal-2" class="nav-link" data-scroll-target="#entrenamiento-de-red-neuronal-2"><span class="header-section-number">3.5.3</span> Entrenamiento de Red Neuronal</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Buenas referencias https://repository.urosario.edu.co/server/api/core/bitstreams/7ae959ec-81de-435b-aca4-e9bb365e4894/content</p>
+<p>Buena documentación (graficos)</p>
+<p>https://www.cs.us.es/~fsancho/Blog/posts/Algoritmos_Geneticos.md.html</p>
+<p>http://www.robolabo.etsit.upm.es/asignaturas/irin/transparencias/AG.pdf</p>
+<p>http://www.sc.ehu.es/ccwbayes/docencia/mmcc/docs/temageneticos.pdf</p>
+<p>https://sci2s.ugr.es/sites/default/files/files/Teaching/GraduatesCourses/Bioinformatica/Tema%2006%20-%20AGs%20I.pdf</p>
+<p>Libros de Algoritmos Genéticos</p>
+<p>Individuo o Cromosoma Compuesto de Genes Codificación de genes (Binaria, Entera, Real)</p>
+<section id="introducción" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="introducción"><span class="header-section-number">3.1</span> Introducción</h2>
+<p>Los <strong>algoritmos genéticos</strong>, o también llamados <strong>algoritmos evolutivos</strong> es un método bastante común en minería de datos. Se inspiran en el <strong>proceso natural de selección y evolución</strong> tal y como se describe por la teoría evolucionista de la selección natural postulada por <strong>Darwin</strong> <span class="citation" data-cites="darwin1859">[@darwin1859]</span>.</p>
+<p>Los <strong>principios</strong> sobre los que se asientan los algoritmos genéticos son:</p>
+<ul>
+<li><p>Los individuos <strong>mejor adaptados</strong> al entorno son aquellos que tienen una probabilidad mayor de <strong>sobrevivir</strong> y, por ende, de <strong>reproducirse</strong>.</p></li>
+<li><p>Los descendientes <strong>heredan</strong> características de sus progenitores.</p></li>
+<li><p>De forma esporádica y natural se producen <strong>mutaciones</strong> en el material genético de algunos individuos, provocando cambios permanentes.</p></li>
+</ul>
+<p>Los algoritmos genéticos se empezaron a estudiar sobre los años 60 a partir del trabajo de Fogel <span class="citation" data-cites="fogel1966">[@fogel1966]</span> (donde los organismos eran máquinas de esados finitos), siguiendo con los trabajos de Rechenberg <span class="citation" data-cites="rechenberg1973">[@rechenberg1973]</span> (se establecen estrategias de selección) y principalmente de Holland <span class="citation" data-cites="holland1975">[@holland1975]</span> (se estableció el nombre de <strong>Algoritmos Genéticos</strong>).</p>
+<p>Los algoritmos genéticos son adecuados para obtener buenas aproximaciones en <strong>problemas de búsqueda, aprendizaje y optimización</strong> <span class="citation" data-cites="marczyk2004">[@marczyk2004]</span>.</p>
+<p>De forma esquemática un algoritmo genético es una <strong>función matemática</strong> que tomando como entrada unos individuos iniciales (<strong>población origen</strong>) selecciona aquellos <strong>ejemplares</strong> (también llamados individuos o cromosomas) que <strong>recombinándose</strong> por algún método generarán como resultado la <strong>siguiente generación</strong>. Esta función se aplicará de forma <strong>iterativa</strong> hasta verificar alguna condición de parada, bien pueda ser un número máximo de iteraciones o bien la obtención de un individuo que cumpla unas restricciones iniciales.</p>
+<p><strong>Condiciones para la aplicación de los Algoritmos Genéticos</strong></p>
+<p>No es posible la aplicación en toda clase de problemas de los algoritmos genéticos. Para que estos puedan aplicarse, los problemas deben cumplir las siguientes condiciones:</p>
+<ul>
+<li><p>El <strong>espacio de búsqueda</strong> [^Recordemos que cualquier método de Data Mining se puede asimilar como una búsqueda en el espacio solución, es decir, el espacio formado por todas las posibles soluciones de un problema] debe estar acotado, por tanto ser <strong>finito</strong>.</p></li>
+<li><p>Es necesario poseer una <strong>función</strong> de aptitud, que denominaremos <strong>fitness</strong>, que evalúe cada solución (individuo) indicándonos de forma cuantitativa cuán buena o mala es una solución concreta.</p></li>
+<li><p>Las <strong>soluciones</strong> deben ser <strong>codificables</strong> en un lenguaje comprensible para un <strong>ordenador</strong>, y si es posible de la forma más <strong>compacta</strong> y abreviada posible.</p></li>
+</ul>
+<p>Habitualmente, la segunda condición es la más complicada de conseguir, para ciertos problemas es trivial la función de fitness (por ejemplo, en el caso de la búsqueda del máximo de una función) no obstante, en la vida real a veces es muy complicada de obtener y, habitualmente, se realizan conjeturas evaluándose los algoritmos con varias funciones de fitness.</p>
+<p><strong>Ventajas e inconvenientes</strong></p>
+<p><strong>Ventajas</strong></p>
+<ul>
+<li><p>No necesitan ningún conocimiento particular del problema sobre el que trabajan, únicamente cada ejemplar debe representar una posible solución al problema.</p></li>
+<li><p>Es un algoritmo admisible, es decir, con un número de iteraciones suficiente son capaces de obtener la solución óptima en problemas de optimización.</p></li>
+<li><p>Los algoritmos genéticos son bastante robustos frente a falsas soluciones ya que al realizar una inspección del espacio solución de forma no lineal (por ejemplo, si quisiéramos obtener el máximo absoluto de una función) el algoritmo no recorre la función de forma consecutiva por lo que no se ve afectada por máximos locales.</p></li>
+<li><p>Altamente paralelizable, es decir, ya que el cálculo no es lineal podemos utilizar varias máquinas para ejecutar el programa y evaluar así un mayor número de casos.</p></li>
+<li><p>Pueden ser incrustrables en muchos algoritmos de data mining para formar modelos híbridos. Por ejemplo para seleccionar el número óptimo de neuronas en un modelo de Perceptrón Multicapa.</p></li>
+</ul>
+<p><strong>Inconvenientes</strong></p>
+<ul>
+<li><p>Su coste computacional puede llegar a ser muy elevado, si el espacio de trabajo es muy grande.</p></li>
+<li><p>En el caso de que no se haga un correcto ajuste de los parámetros pueden llegar a caer en una situación de dominación en la que se produce un bucle infinito ya que unos individuos dominan sobre los demás impidiendo la evolución de la población y por tanto inhiben la diversidad biológica.</p></li>
+<li><p>Puede llegar a ser muy complicado encontrar una función de evaluación de cada uno de los individuos para seleccionar los mejores de los peores.</p></li>
+</ul>
+</section>
+<section id="fundamentos-teóricos" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="fundamentos-teóricos"><span class="header-section-number">3.2</span> Fundamentos teóricos</h2>
+<p>A continuación, se explican los conceptos básicos de los algoritmos genéticos.</p>
+<section id="codificación-de-los-datos" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="codificación-de-los-datos"><span class="header-section-number">3.2.1</span> Codificación de los datos</h3>
+<p>Cada <strong>individuo o cromosoma</strong> está formado por unos cuantos <strong>genes</strong>. Para nuestro caso vamos a establecer que los indiduos tienen un único cromosoma con una cierta cantidad de genes. Estos genes los consideramos como la cantidad mínima de información que se puede transferir. Los genes se pueden agrupar en <strong>características o rasgos</strong> que nos podrían ayudar en la resolución de ciertos problemas.</p>
+<p>Estos individuos con sus genes los tenemos que representar de forma que podamos codificar esa información.</p>
+<div id="fig-cromosoma" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cromosoma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/cromosoma.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cromosoma-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Representación de un cromosoma
+</figcaption>
+</figure>
+</div>
+<p>Los principales métodos de representación son:</p>
+<ul>
+<li><p><strong>Binaria:</strong> Los individuos/cromosomas están representados por una serie de genes que son bits ( valores 0 ó 1).</p></li>
+<li><p><strong>Entera:</strong> Los individuos/cromosomas están representados por una serie de genes que son números enteros.</p></li>
+<li><p><strong>Real:</strong> Los individuos/cromosomas están representados por una serie de genes que son números reales en coma flotante.</p></li>
+<li><p><strong>Permutacional:</strong> Los individuos/cromosomas están representados por una serie de genes que son permutaciones de un conjunto de elementos. Se usan en aquellos problemas en los que la secuencia u orden es importante.</p></li>
+<li><p><strong>Basada en árboles:</strong> Los individuos/cromosomas están representados por una serie de genes que son estructuras jerárquicas.</p></li>
+</ul>
+<div id="fig-representaciones-individuo" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-representaciones-individuo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/representaciones_individuo.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-representaciones-individuo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Diferentes representaciones
+</figcaption>
+</figure>
+</div>
+<p>El primer paso para conseguir que un ordenador procese unos <strong>datos</strong> es conseguir <strong>representarlos</strong> de una forma apropiada. En primer término, para codificar los datos, es necesario separar las posibles configuraciones posibles del dominio del problema en un <strong>conjunto</strong> de <strong>estados</strong> <strong>finito</strong>.</p>
+<p>Una vez obtenida esta clasificación el objetivo es representar cada <strong>estado</strong> de <strong>forma</strong> <strong>unívoca</strong> con una cadena (compuesta en la mayoría de casos por unos y ceros).</p>
+<p>A pesar de que cada estado puede codificarse con alfabetos de diferente cardinalidad[^La longitud de las cadenas que representen los posibles estados no es necesario que sea fija, representaciones como la de Kitano para representar operaciones matemáticas son un ejemplo de esto], uno de los resultados fundamentales de la teoría de algoritmos genéticos es el <strong>Teorema del Esquema</strong> de Holland <span class="citation" data-cites="holland1975">[@holland1975]</span>, que afirma que la codificación <strong>óptima</strong> es aquella en la que los algoritmos tienen un alfabeto de cardinalidad, es decir el uso del <strong>alfabeto</strong> <strong>binario</strong>.</p>
+<p>El enunciado del <strong>Teorema del Esquema</strong> es el siguiente: <em>Esquemas cortos, de bajo orden y aptitud superior al promedio reciben un incremento exponencial de representantes en generaciones subsecuentes de un Algoritmo Genético.</em></p>
+<p>Una de las ventajas de usar un alfabeto binario para la construcción de configuraciones de estados es la sencillez de los operadores utilizados para la modificación de estas. En el caso de que el alfabeto sea binario, los operadores se denominan, lógicamente, <strong>operadores</strong> <strong>binarios</strong>. Es importante destacar que variables que estén próximas en el espacio del problema deben preferiblemente estarlo en la codificación ya que la proximidad entre ellas condiciona un elemento determinante en la mutación y reproducibilidad de éstas. Es decir, dos estados que en nuestro espacio de estados del universo del problema que están consecutivos deberían estarlo en la representación de los datos, esto es útil para que cuando haya mutaciones los saltos se den entre estados consecutivos. En términos generales cumplir esta premisa mejora experimentalmente los resultados obtenidos con algoritmos genéticos.</p>
+<p>En la práctica el factor que condiciona en mayor grado el fracaso o el <strong>éxito</strong> de la aplicación de algoritmos genéticos a un problema dado es una <strong>codificación</strong> <strong>acorde</strong> con los <strong>datos</strong>.</p>
+<p>Otra opción muy común es establecer a cada uno de los posibles casos un <strong>número</strong> <strong>natural</strong> y luego codificar ese número en binario natural, de esta forma minimizamos el problema que surge al concatenar múltiples variables independientes en el que su representación binaria diera lugar a numerosos huecos que produjeran soluciones no válidas.</p>
+</section>
+<section id="algoritmo" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="algoritmo"><span class="header-section-number">3.2.2</span> Algoritmo</h3>
+<p>Un algoritmo genético implementado en <strong>pseudo código</strong> podría ser el siguiente:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource pseudocode number-lines code-with-copy"><code class="sourceCode"><span id="cb1-1"><a href="#cb1-1"></a>#| label: alg-genetico</span>
+<span id="cb1-2"><a href="#cb1-2"></a>#| html-indent-size: "1.2em"</span>
+<span id="cb1-3"><a href="#cb1-3"></a>#| html-comment-delimiter: "//"</span>
+<span id="cb1-4"><a href="#cb1-4"></a>#| html-line-number: true</span>
+<span id="cb1-5"><a href="#cb1-5"></a>#| html-line-number-punc: ":"</span>
+<span id="cb1-6"><a href="#cb1-6"></a>#| html-no-end: false</span>
+<span id="cb1-7"><a href="#cb1-7"></a>#| pdf-placement: "htb!"</span>
+<span id="cb1-8"><a href="#cb1-8"></a>#| pdf-line-number: true</span>
+<span id="cb1-9"><a href="#cb1-9"></a></span>
+<span id="cb1-10"><a href="#cb1-10"></a></span>
+<span id="cb1-11"><a href="#cb1-11"></a>\floatname{algorithm}{Algoritmo}</span>
+<span id="cb1-12"><a href="#cb1-12"></a></span>
+<span id="cb1-13"><a href="#cb1-13"></a>\begin{algorithm}</span>
+<span id="cb1-14"><a href="#cb1-14"></a>\caption{Quicksort}</span>
+<span id="cb1-15"><a href="#cb1-15"></a>\begin{algorithmic}</span>
+<span id="cb1-16"><a href="#cb1-16"></a>\Procedure{Quicksort}{$A, p, r$}</span>
+<span id="cb1-17"><a href="#cb1-17"></a>  \If{$p &lt; r$}</span>
+<span id="cb1-18"><a href="#cb1-18"></a>    \State $q = $ \Call{Partition}{$A, p, r$}</span>
+<span id="cb1-19"><a href="#cb1-19"></a>    \State \Call{Quicksort}{$A, p, q - 1$}</span>
+<span id="cb1-20"><a href="#cb1-20"></a>    \State \Call{Quicksort}{$A, q + 1, r$}</span>
+<span id="cb1-21"><a href="#cb1-21"></a>  \EndIf</span>
+<span id="cb1-22"><a href="#cb1-22"></a>\EndProcedure</span>
+<span id="cb1-23"><a href="#cb1-23"></a>\Procedure{Partition}{$A, p, r$}</span>
+<span id="cb1-24"><a href="#cb1-24"></a> </span>
+<span id="cb1-25"><a href="#cb1-25"></a></span>
+<span id="cb1-26"><a href="#cb1-26"></a>      \State $i = i + 1$</span>
+<span id="cb1-27"><a href="#cb1-27"></a>      \State exchange</span>
+<span id="cb1-28"><a href="#cb1-28"></a></span>
+<span id="cb1-29"><a href="#cb1-29"></a>\EndProcedure</span>
+<span id="cb1-30"><a href="#cb1-30"></a>\end{algorithmic}</span>
+<span id="cb1-31"><a href="#cb1-31"></a>\end{algorithm}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Un posible diagrama de flujo que puede representar una posible implementación de algoritmos genéticos se muestra en la figura <span class="math inline">\(\ref{fig-esquema-genetico}\)</span> .</p>
+<div id="fig-esquema-genetico" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-esquema-genetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/esquema_genetico.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-esquema-genetico-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.3: Esquema de implementación de un algoritmo genético
+</figcaption>
+</figure>
+</div>
+<p>A continuación, en los siguientes apartados, se hará una descripción de las fases anteriormente expuestas:</p>
+<p><strong>Inicializar Población</strong></p>
+<p>Como ya se ha explicado antes, el primer paso es inicializar la población origen. Habitualmente la inicialización se hace de forma <strong>aleatoria</strong> procurando una <strong>distribución</strong> <strong>homogénea</strong> en los casos iniciales de prueba. No obstante, si se tiene un conocimiento más profundo del problema es posible obtener mejores resultados inicializando la población de una forma apropiada a la clase de soluciones que se esperan obtener.</p>
+<p><strong>Evaluar Población</strong></p>
+<p>Durante cada <strong>iteración</strong> (generación) cada individuo/cromosoma se decodifica convirtiéndose en un grupo de parámetros del problema y se evalúa el problema con esos datos.</p>
+<p>Pongamos por <strong>ejemplo</strong> que queremos evaluar el máximo de la función <span class="math inline">\(f(x)=x²\)</span> en el intervalo <span class="math inline">\([0,1]\)</span> y supongamos que construimos cada individuo con <strong>6 dígitos</strong> <span class="math inline">\((2^6=64)\)</span> , por lo que interpretando el número obtenido en binario natural y dividiéndolo entre 64 obtendremos el punto de la función que corresponde al individuo. Evaluando dicho punto en la función que queremos evaluar (<span class="math inline">\(f(x)=x²\)</span>) obtenemos lo que en nuestro caso sería el <strong>fitness</strong>, en este caso cuanto mayor fitness tenga un individuo, mejor valorado está y más probable es que prospere su descendencia en el futuro. No en todas las implementaciones de algoritmos genéticos se realiza una fase de evaluación de la población tal y como aquí está descrita, en ciertas ocasiones se omite y no se genera ningún fitness asociado a cada estado evaluado. La fase de selección elige los individuos a reproducirse en la próxima generación, esta selección puede realizarse por muy distintos métodos.</p>
+<p>En el algoritmo mostrado en pseudo código anteriormente el <strong>método</strong> de <strong>selección</strong> usado depende del fitness de cada individuo. A continuación, se describen los más comunes:</p>
+<p><strong>Selección elitista:</strong> Se seleccionan los individuos con mayor fitness de cada generación. La mayoría de los algoritmos genéticos no aplican un elitismo puro, sino que en cada generación evalúan el fitness de cada uno de los individuos, en el caso de que los mejores de la anterior generación sean mejores que los de la actual éstos se copian sin recombinación a la siguiente generación.</p>
+<p><strong>Selección proporcional a la aptitud:</strong> los individuos más aptos tienen más probabilidad de ser seleccionados, asignándoles una probabilidad de selección más alta. Una vez seleccionadas las probabilidades de selección a cada uno de los individuos se genera una nueva población teniendo en cuenta éstas.</p>
+<p><strong>Selección por rueda de ruleta:</strong> Es un método conceptualmente similar al anterior. Se le asigna una probabilidad absoluta de aparición de cada individuo de acuerdo al fitness de forma que ocupe un tramo del intervalo total de probabilidad (de 0 a 1) de forma acorde a su fitness. Una vez completado el tramo total se generan números aleatorios de 0 a 1 de forma que se seleccionen los individuos que serán el caldo de cultivo de la siguiente generación.</p>
+<p><strong>Selección por torneo:</strong> se eligen subgrupos de individuos de la población, y los miembros de cada subgrupo compiten entre ellos. Sólo se elige a un individuo de cada subgrupo para la reproducción.</p>
+<p><strong>Selección por rango:</strong> a cada individuo de la población se le asigna un rango numérico basado en su fitness, y la selección se basa en este ranking, en lugar de las diferencias absolutas en el fitness. La ventaja de este método es que puede evitar que individuos muy aptos ganen dominancia al principio a expensas de los menos aptos, lo que reduciría la diversidad genética de la población y podría obstaculizar la búsqueda de una solución aceptable. Un ejemplo de esto podría ser que al intentar maximizar una función el algoritmo genético convergiera hacía un máximo local que posee un fitness mucho mejor que el de sus congéneres de población lo que haría que hubiera una dominancia clara con la consecuente desaparición de los individuos menos aptos (con peor fitness).</p>
+<p><strong>Selección generacional</strong>: la descendencia de los individuos seleccionados en cada generación se convierte en la siguiente generación. No se conservan individuos entre las generaciones.</p>
+<p><strong>Selección por estado estacionario:</strong> la descendencia de los individuos seleccionados en cada generación vuelve al acervo genético preexistente, reemplazando a algunos de los miembros menos aptos de la siguiente generación. Se conservan algunos individuos entre generaciones.</p>
+<p><strong>Búsqueda del estado estacionario:</strong> Ordenamos todos los genes por su fitness en orden decreciente y eliminamos los últimos m genes, que se sustituyen por otros m descendientes de los demás. Este método tiende a estabilizarse y converger.</p>
+<p><strong>Selección jerárquica:</strong> los individuos atraviesan múltiples rondas de selección en cada generación. Las evaluaciones de los primeros niveles son más rápidas y menos discriminatorias, mientras que los que sobreviven hasta niveles más altos son evaluados más rigurosamente. La ventaja de este método es que reduce el tiempo total de cálculo al utilizar una evaluación más rápida y menos selectiva para eliminar a la mayoría de los individuos que se muestran poco o nada prometedores, y sometiendo a una evaluación de aptitud más rigurosa y computacionalmente más costosa sólo a los que sobreviven a esta prueba inicial.</p>
+<p><strong>Recombinación</strong>.</p>
+<p><strong>Recombinación</strong> también llamada <strong>Cross-over o reproducción</strong>. La recombinación es el operador genético más utilizado y consiste en el <strong>intercambio</strong> de <strong>material</strong> <strong>genético</strong> entre <strong>dos</strong> <strong>individuos</strong> al azar (pueden ser incluso entre el mismo elemento). El material genético se intercambia entre <strong>bloques</strong>. Gracias a la presión selectiva[^ Presión Selectiva es la fuerza a la que se ven sometido naturalmente los genes con el paso del tiempo. Con el sucesivo paso de las generaciones los genes menos útiles estarán sometidos a una mayor presión selectiva produciéndose la paulatina desaparición de estos] irán predominando los mejores bloques génicos.</p>
+<p>Existen diversos <strong>tipos</strong> de <strong>cross-over:</strong></p>
+<p><strong>Cross-over de 1 punto.</strong> Los cromosomas se cortan por 1 punto y se intercambian los dos bloques de genes.</p>
+<p><strong>Cross-over de n-puntos.</strong> Los cromosomas se cortan por n puntos y el resultado se intercambia.</p>
+<p><strong>Cross-over uniforme.</strong> Se genera un patrón aleatorio en binario, y en los elementos que haya un 1 se realiza intercambio genético.</p>
+<p><strong>Cross-over especializados.</strong> En ocasiones, el espacio de soluciones no es continuo y hay soluciones que a pesar de que sean factibles de producirse en el gen no lo son en la realidad, por lo que hay que incluir restricciones al realizar la recombinación que impidan la aparición de algunas combinaciones.</p>
+<div id="fig-crossover" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-crossover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-crossover1" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-crossover1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/cross-over1.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-crossover1-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Cross-over 1 punto
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-crossoevern" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-crossoevern-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/cross-overN.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-crossoevern-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Cross-over n puntos
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 33.3%;justify-content: flex-start;">
+<div id="fig-crossover-uniforme" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-crossover-uniforme-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/cross-over-uniforme.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-crossover-uniforme-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Cross-over uniforme
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-crossover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.4: Cross-Over
+</figcaption>
+</figure>
+</div>
+<p><strong>Mutación</strong>.</p>
+<p>Este fenómeno, generalmente muy raro en la naturaleza, se modela de la siguiente forma: cuando se genera un hijo se examinan uno a uno los genes del mismo y se genera un coeficiente aleatorio para cada uno. En el caso de que algún coeficiente supere un cierto umbral se modifica dicho gen. Modificando el umbral podemos variar la probabilidad de la mutación. Las mutaciones son un mecanismo muy interesante por el cual es posible generar nuevos individuos con rasgos distintos a sus predecesores.</p>
+<p>Los <strong>tipos</strong> de <strong>mutación</strong> más conocidos son:</p>
+<ul>
+<li><p><strong>Mutación de gen</strong>: existe una única probabilidad de que se produzca una mutación de algún gen De producirse, el algoritmo toma aleatoriamente un gen, y lo invierte.</p></li>
+<li><p><strong>Mutación multigen:</strong> cada gen tiene una probabilidad de mutarse o no, que es calculada en cada pasada del operador de mutación multigen.</p></li>
+<li><p><strong>Mutación de intercambio:</strong> Se intercambia el contenido de dos genes aleatoriamente.</p></li>
+<li><p><strong>Mutación de barajado:</strong> existe una probabilidad de que se produzca una mutación. De producirse, toma dos genes aleatoriamente y baraja de forma aleatoria los genes, según hubiéramos escogido, comprendidos entre los dos.</p></li>
+</ul>
+<div id="fig-crossover" class="quarto-layout-panel">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-crossover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-mutacion-gen" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-mutacion-gen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/mutacion-gen.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-mutacion-gen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(a) Mutacion gen
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-mutacion-multigen" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-mutacion-multigen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/mutacion-multigen.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-mutacion-multigen-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(b) Mutacion multigen
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<div class="quarto-layout-row">
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-mutacion-intercambio" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-mutacion-intercambio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/mutacion-intercambio.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-mutacion-intercambio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(c) Mutacion intercambio
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="quarto-layout-cell-subref quarto-layout-cell" data-ref-parent="fig-crossover" style="flex-basis: 50.0%;justify-content: flex-start;">
+<div id="fig-mutacion-barajado" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-subfloat-fig figure">
+<div aria-describedby="fig-mutacion-barajado-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/mutacion-barajado.png" class="img-fluid figure-img" data-ref-parent="fig-crossover">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-subfloat-caption quarto-subfloat-fig" id="fig-mutacion-barajado-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+(d) Mutacion barajado
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-crossover-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.5: Mutación
+</figcaption>
+</figure>
+</div>
+<p>Estos ejemplos de <strong>mutaciones</strong> han sido ilustradas usando una representación binaria de los datos, en caso de tener una representación <strong>entera</strong> al hacer la mutación no cambiaríamos de 0 a 1 o viceversa, sino que se elegiría al azar un entero de los posibles valores que tenemos para ese gen. En el caso de una representación <strong>real</strong> se podría pensar en al mutación de un gen como la selección de un número real entre unos valores dados mediante una <strong>distribución uniforme</strong> o incluso una <strong>distribución normal</strong>. Para profundizar en operadores sobre disintos tipos de representaciones puedes consultar [@ Eiben2015]</p>
+<p><strong>Condición de finalización</strong></p>
+<p>Una vez que se ha generado la nueva población se evalúa la misma y se selecciona a aquel individuo o aquellos que por su fitness se consideran los más aptos. Podemos tener definido un umbral del valor de fitness que queremos alcanzar o simplemente definir el número de iteraciones que queremos que se realicen.</p>
+</section>
+<section id="otros-operadores" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="otros-operadores"><span class="header-section-number">3.2.3</span> Otros Operadores</h3>
+<p>Los operadores descritos anteriormente suelen ser operadores <strong>generalistas</strong> (aplicables y de hecho aplicados a todo tipo de problemas), sin embargo, para ciertos contextos suele ser más recomendable el uso de operadores específicos para realizar un recorrido por el espacio de solución más acorde a la solución buscada.</p>
+<p><strong>Modificadores de la longitud de los individuos</strong>. En ocasiones las soluciones no son una combinación de todas las variables de entrada, en estas ocasiones los individuos deberán tener una longitud variable[^En muchas ocasiones, se realizan estudios de minería de datos sobre todos los datos existentes, encontrándose en ellos variables espúreas, es decir, variables que no aportan nada de información para el problema evaluado]. Lógicamente, en este tipo de casos, es necesario modificar la longitud de los individuos, para ello haremos uso de los operadores añadir y quitar, que añadirán o quitarán a un individuo un trozo de su carga génica (es decir, un trozo de información).</p>
+</section>
+<section id="parámetros-necesarios-al-aplicar-algoritmos-genéticos" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="parámetros-necesarios-al-aplicar-algoritmos-genéticos"><span class="header-section-number">3.2.4</span> Parámetros necesarios al aplicar Algoritmos Genéticos</h3>
+<p>Cualquier algoritmo genético necesita ciertos parámetros que deben fijarse antes de cada ejecución, como:</p>
+<p><strong>Tamaño de la población:</strong> Determina el tamaño máximo de la población a obtener. En la práctica debe ser de un valor lo suficientemente grande para permitir diversidad de soluciones e intentar llegar a una buena solución, pero siendo un número que sea computable en un tiempo razonable.</p>
+<p><strong>Condición de terminación:</strong> Es la condición de parada del algoritmo. Habitualmente es la convergencia de la solución (si es que la hay), un número prefijado de generaciones o una aproximación a la solución con un cierto margen de error.</p>
+<p><strong>Individuos que intervienen en la reproducción de cada generación:</strong> se especifica el porcentaje de individuos de la población total que formarán parte del acervo de padres de la siguiente generación. Esta proporción es denominada proporción de cruces.</p>
+<p><strong>Probabilidad de ocurrencia de una mutación:</strong> En toda ejecución de un algoritmo genético hay que decidir con qué frecuencia se va a aplicar la mutación. Se debe de añadir algún parámetro adicional que indique con qué frecuencia se va a aplicar dentro de cada gen del cromosoma. La frecuencia de aplicación de cada operador estará en función del problema; teniendo en cuenta los efectos de cada operador, tendrá que aplicarse con cierta frecuencia o no. Generalmente, la mutación y otros operadores que generen diversidad se suelen aplicar con poca frecuencia; la recombinación se suele aplicar con frecuencia alta.</p>
+<p>Cada implementación de algoritmo tendrá sus propios parámetros que permitirán personalizar la ejecución de nuestro problema concreto.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Recordad">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Recordad
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Los algoritmos genéticos es uno de los <strong>enfoques más originales</strong> en data mining. Su sencillez, combinada con su flexibilidad les proporciona una <strong>robustez</strong> que les hace adecuados a infinidad de problemas. No obstante, su <strong>simplicidad</strong> y sobre todo independencia del problema hace que sean algoritmos poco específicos. Recorriendo este capítulo hemos visto los numerosos parámetros y métodos aplicables a los algoritmos genéticos que nos ayudan a realizar una adaptación de los algoritmos genéticos más concreta a un problema. En definitiva, la implementación de esquemas evolutivos tal y como se describen en biología podemos afirmar que funciona.</p>
+</div>
+</div>
+</section>
+</section>
+<section id="casos-de-uso" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="casos-de-uso"><span class="header-section-number">3.3</span> Casos de uso</h2>
+<p>Para los <strong>Algoritmos genéticos</strong> tenemos 3 grandes grupos de casos de uso:</p>
+<ul>
+<li><strong>Optimización de Funciones</strong>
+<ul>
+<li>Podemos buscar máximo o mínimos de funciones.</li>
+</ul></li>
+<li><strong>Optimización Cominatorial</strong>
+<ul>
+<li>TSP (Travel Salesman Problem) Problema del viajante</li>
+<li>VRP (Vechicule Routing Problem) Problema de rutas de vehículos</li>
+</ul></li>
+<li><strong>Optimización Machine Learning</strong>
+<ul>
+<li>Hiperparámetros</li>
+<li>Selección de variables</li>
+<li>Network Architecture</li>
+</ul></li>
+</ul>
+<p>Vamos a ver cómo se podrían abordar algunos de estos casos de uso:</p>
+<section id="selección-de-variable" class="level3" data-number="3.3.1">
+<h3 data-number="3.3.1" class="anchored" data-anchor-id="selección-de-variable"><span class="header-section-number">3.3.1</span> Selección de Variable</h3>
+<p>El objetivo del ejemplo es ver cómo podemos usar un algoritmo genético para hacer una <strong>selección de variables</strong>, quedándonos sólo con unas pocas.</p>
+<p>Supongamos que tenemos un <strong>dataset</strong> que es un problema de <strong>clasificación</strong> con <strong>3 clases</strong>, cuenta con <strong>1500 muestras</strong> y <strong>14 variables</strong> explicativas.</p>
+<p>Tendremos que, para el algoritmo genético, nuestro cromosoma o individuo será un <strong>vector</strong> de tamaño 14 (<strong>14 genes</strong>), que representa las <strong>14 variables</strong> del dataset que hemos preparado.</p>
+<p>En la imagen <a href="#fig-poblacion" class="quarto-xref">Figure&nbsp;<span>3.6</span></a> mostramosla población de 100 individuos en una iteración N.</p>
+<div id="fig-poblacion" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/poblacion.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.6: Población en iteración N
+</figcaption>
+</figure>
+</div>
+<p><strong>Función Fitness</strong> (Evaluación)</p>
+<p>Cuando estamos trabajando con selección de variables, el objetivo es conseguir el conjunto de variables que mejor modelo construyan según nuestro dataset. En este caso, al ser un problema de <strong>clasificación</strong>, veremos cual es la combinación de variables que nos da <strong>menos errores al clasificar</strong>.</p>
+<p>Nuestra función fitness deberá seguir estos <strong>pasos</strong>:</p>
+<p>- Recibe una <strong>variable</strong> que tiene el tamaño del numero de variables (el tamaño del cromosoma) que hay en el dataframe (en nuestro caso 14) de datos.</p>
+<ul>
+<li>Los valores son <strong>1</strong> si esa variable se va a <strong>usar</strong> y <strong>0</strong> si <strong>no</strong> se va a <strong>usar</strong>.</li>
+</ul>
+<p>- Se construye un <strong>modelo</strong>, en este caso usamos <strong>LDA</strong> (Análisis Discriminante Lineal) con las <strong>variables</strong> que tienen <strong>valor 1</strong>.</p>
+<p>- Calculamos el <strong>error</strong> que queremos minimizar (número de fallos)</p>
+<p>- Para este caso del LDA cogemos los valores <strong>$posterior</strong> que nos dan la probabilidad de cada clase para cada entrada de la muestra</p>
+<p>- Calculamos cual es el <strong>máximo</strong> y así le asignamos esa <strong>clase</strong> como su solución. También podríamos coger directamente el valor de $class con la clase dada como predicción.</p>
+<p>- Verificamos cuantos hemos fallado y lo dividimos por el número de muestras para ver el <strong>porcentaje</strong> de <strong>fallos</strong></p>
+<p>- Devolvemos el <strong>porcentaje de fallos</strong>. El resultado de la ejecución del algoritmo evolutivo nos dará un objeto del que tendremos que obtener que variables son las que queremos usar.</p>
+<p><a href="#fig-poblacion_final" class="quarto-xref">Figure&nbsp;<span>3.7</span></a></p>
+<div id="fig-poblacion_final" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion_final-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/poblacion_final.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion_final-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.7: Población Final
+</figcaption>
+</figure>
+</div>
+<p>Una vez que nuestro algoritmo pare, deberíamos tener la población que mejor se ha adaptado según el fitness que habíamos definido.</p>
+<p>En nuestro caso estarán por ejemplo las 100 mejores combinaciones de variables, que dan el menor error al clasificar. De esta manera si para cada variable contamos cuantas veces ha salido en cada elemento de la población, sabremos cuantas veces se ha usado en las combinaciones de variables de esta última iteración (que es la mejor hasta ese momento). Con lo cual podremos saber cuales han sido las <strong>variables</strong> <strong>más</strong> <strong>usadas</strong> en la población final.</p>
+<p>El objeto <strong>modelo_evolutivo</strong>, que nos devuelve rbga.bin, tiene una variable <strong>population</strong> de dimensiones tamaño_población x numero_variables , en nuestro caso de 100x14, que tiene la información de la población de la <strong>última iteración del algoritmo</strong>, que en un principio debería ser la mejor. Este population contiene para cada fila (elemento en la población), 0 o 1 en la posición que corresponde a cada variable.</p>
+<p>Para ver cuales son las variables que más se han usado tenemos que sumar por columnas y ese dato nos dará para cada columna (corresponde con una variable) la cantidad de veces que se ha usado en esta población. Una vez tenemos estos datos ya podemos quedarnos con el número de variables que deseemos cogiendo las que más alto valor tienen.</p>
+<p><a href="#fig-frecuencia_variables" class="quarto-xref">Figure&nbsp;<span>3.8</span></a></p>
+<p>Imagen <span class="math inline">\(\ref{fig-frecuencia_variables}\)</span></p>
+<div id="fig-frecuencia_variables" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-frecuencia_variables-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/frecuencia_variables.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-frecuencia_variables-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.8: Frecuencia de las Variables
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="entrenamiento-de-red-neuronal" class="level3" data-number="3.3.2">
+<h3 data-number="3.3.2" class="anchored" data-anchor-id="entrenamiento-de-red-neuronal"><span class="header-section-number">3.3.2</span> Entrenamiento de Red Neuronal</h3>
+<p>Otro de los casos de uso sobre los que se podría trabajar con un <strong>Algoritmo Genético</strong> es el entrenamiento de una Red Neuronal. La forma estandard de entrenar una Red Neuronal es lo que se denomina el Backpropagation, que mediante el uso de las estrategias del <strong>Descenso del Gradiente</strong> se consigue optimizar los parámetros de la Red Neuronal.</p>
+<p>Cuando entrenamos una Red Neuronal, lo que conseguimos es obtener una serie de valores de los <strong>pesos</strong> de la Red Neuronal. Estos pesos combinados con las funciones de activación serán los que nos darán el resultado de salida a partir de los datos de entrada.</p>
+<p>Supongamos que tenemos una <strong>Red Neuronal</strong> con <strong>500</strong> parámetros distribuidos en las diferentes capas ocultas del mismo.</p>
+<p>Tendremos que, para el algoritmo genético, nuestro cromosoma o individuo será un <strong>vector</strong> de tamaño 500 (<strong>500 genes</strong>), que representan los <strong>500 valores</strong> de los pesos de la Red Neuronal. En este caso los valores del vector tendrán una <strong>representación real</strong>.</p>
+<p>A cada uno de estos posibles valores reales lo deberemos acotar en un rango de valores, que podría ser *(-2.0 , 2.0 ) de forma que cuando cuando se generen los valores aleatorios de una población, cada dato deberá partir de este rango.</p>
+<p>En la imagen <a href="#fig-poblacion" class="quarto-xref">Figure&nbsp;<span>3.6</span></a> mostramos la población de 100 individuos en una iteración N.</p>
+<div id="fig-poblacion_entrenamiento_red" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/entrenamiento_red_poblacion.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.9: Población en iteración N
+</figcaption>
+</figure>
+</div>
+<p><strong>Función Fitness</strong> (Evaluación)</p>
+<p>Cuando estamos trabajando con el Entrenamiento de una Red Neuronal, el objetivo es conseguir la red neuronal que mejor valor de la <strong>función de pérdida</strong> de la red neuronal tenga.</p>
+<p>Nuestra función fitness deberá seguir estos <strong>pasos</strong>:</p>
+<p>- Recibe una <strong>variable</strong> que tiene el tamaño del numero de pesos en la red neuronal (el tamaño del cromosoma), en nuestro caso 500.</p>
+<ul>
+<li>Los valores serán un número real</li>
+</ul>
+<p>- Se cogen estos pesos y se asignan a la Red Neuronal.</p>
+<ul>
+<li>Una vez tenemos la red neuronal, pasamos nuestros datos de entrenamiento y evaluamos el modelo obteniendo el valor de la función de pérdida.</li>
+</ul>
+<p>- Devolvemos el <strong>valor de la función de pérdida</strong>.</p>
+<p><a href="#fig-poblacion_final" class="quarto-xref">Figure&nbsp;<span>3.7</span></a></p>
+<div id="fig-poblacion_final_entrenamiento_red" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion_final_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/entrenamiento_red_poblacion_final.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion_final_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.10: Población Final
+</figcaption>
+</figure>
+</div>
+<p>Una vez que nuestro algoritmo pare, deberíamos tener la población que mejor se ha adaptado según el fitness que habíamos definido.</p>
+<p>Seleccionamos aquella que menor valor de función de pérdida nos haya dado.</p>
+</section>
+<section id="arquitecura-de-redneuronal" class="level3" data-number="3.3.3">
+<h3 data-number="3.3.3" class="anchored" data-anchor-id="arquitecura-de-redneuronal"><span class="header-section-number">3.3.3</span> Arquitecura de RedNeuronal</h3>
+<p>Siguiendo con las redes neuronales, otro de los casos de uso sobre los que se podría trabajar con un <strong>Algoritmo Genético</strong> es la <strong>Arquitectura de Red</strong> de la Red Neuronal. En el sentido de poder definir cuantos nodos por cada capa oculta podemos tener, para conseguir una buena Red Neuronal. En ese caso estamos pensando en una red neuronal usada para datasets clásicos de datos y no de imágenes.</p>
+<p>Cuando entrenamos una Red Neuronal, lo que conseguimos es obtener una serie de valores de los <strong>pesos</strong> de la Red Neuronal. Estos pesos combinados con las funciones de activación serán los que nos darán el resultado de salida a partir de los datos de entrada.</p>
+<p>Supongamos que tenemos una <strong>Red Neuronal</strong> con <strong>500</strong> parámetros distribuidos en las diferentes capas ocultas del mismo.</p>
+<p>Tendremos que, para el algoritmo genético, nuestro cromosoma o individuo será un <strong>vector</strong> de tamaño 500 (<strong>500 genes</strong>), que representan los <strong>500 valores</strong> de los pesos de la Red Neuronal. En este caso los valores del vector tendrán una <strong>representación real</strong>.</p>
+<p>A cada uno de estos posibles valores reales lo deberemos acotar en un rango de valores, que podría ser *(-2.0 , 2.0 ) de forma que cuando cuando se generen los valores aleatorios de una población, cada dato deberá partir de este rango.</p>
+<p>En la imagen <a href="#fig-poblacion" class="quarto-xref">Figure&nbsp;<span>3.6</span></a> mostramos la población de 100 individuos en una iteración N.</p>
+<div id="fig-poblacion_entrenamiento_red" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/entrenamiento_red_poblacion.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.11: Población en iteración N
+</figcaption>
+</figure>
+</div>
+<p><strong>Función Fitness</strong> (Evaluación)</p>
+<p>Cuando estamos trabajando con el Entrenamiento de una Red Neuronal, el objetivo es conseguir la red neuronal que mejor valor de la <strong>función de pérdida</strong> de la red neuronal tenga.</p>
+<p>Nuestra función fitness deberá seguir estos <strong>pasos</strong>:</p>
+<p>- Recibe una <strong>variable</strong> que tiene el tamaño del numero de pesos en la red neuronal (el tamaño del cromosoma), en nuestro caso 500.</p>
+<ul>
+<li>Los valores serán un número real</li>
+</ul>
+<p>- Se cogen estos pesos y se asignan a la Red Neuronal.</p>
+<ul>
+<li>Una vez tenemos la red neuronal, pasamos nuestros datos de entrenamiento y evaluamos el modelo obteniendo el valor de la función de pérdida.</li>
+</ul>
+<p>- Devolvemos el <strong>valor de la función de pérdida</strong>.</p>
+<p><a href="#fig-poblacion_final" class="quarto-xref">Figure&nbsp;<span>3.7</span></a></p>
+<div id="fig-poblacion_final_entrenamiento_red" class="quarto-figure quarto-figure-center quarto-float anchored" data-fig-align="center">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-poblacion_final_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo3/entrenamiento_red_poblacion_final.png" class="img-fluid quarto-figure quarto-figure-center figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-poblacion_final_entrenamiento_red-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.12: Población Final
+</figcaption>
+</figure>
+</div>
+<p>Una vez que nuestro algoritmo pare, deberíamos tener la población que mejor se ha adaptado según el fitness que habíamos definido.</p>
+<p>Seleccionamos aquella que menor valor de función de pérdida nos haya dado.</p>
+</section>
+</section>
+<section id="algoritmos-genéticos-con-r" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="algoritmos-genéticos-con-r"><span class="header-section-number">3.4</span> Algoritmos genéticos con R</h2>
+<section id="paquetes-para-usar-en-r" class="level3" data-number="3.4.1">
+<h3 data-number="3.4.1" class="anchored" data-anchor-id="paquetes-para-usar-en-r"><span class="header-section-number">3.4.1</span> Paquetes para usar en R</h3>
+</section>
+<section id="selección-de-variables" class="level3" data-number="3.4.2">
+<h3 data-number="3.4.2" class="anchored" data-anchor-id="selección-de-variables"><span class="header-section-number">3.4.2</span> Selección de variables</h3>
+</section>
+<section id="entrenamiento-de-red-neuronal-1" class="level3" data-number="3.4.3">
+<h3 data-number="3.4.3" class="anchored" data-anchor-id="entrenamiento-de-red-neuronal-1"><span class="header-section-number">3.4.3</span> Entrenamiento de Red Neuronal</h3>
+</section>
+</section>
+<section id="algoritmos-genéticos-en-python" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="algoritmos-genéticos-en-python"><span class="header-section-number">3.5</span> Algoritmos genéticos en Python</h2>
+<section id="paquetes-para-usar-en-python" class="level3" data-number="3.5.1">
+<h3 data-number="3.5.1" class="anchored" data-anchor-id="paquetes-para-usar-en-python"><span class="header-section-number">3.5.1</span> Paquetes para usar en Python</h3>
+</section>
+<section id="optimiación-de-funciones" class="level3" data-number="3.5.2">
+<h3 data-number="3.5.2" class="anchored" data-anchor-id="optimiación-de-funciones"><span class="header-section-number">3.5.2</span> Optimiación de funciones</h3>
+</section>
+<section id="entrenamiento-de-red-neuronal-2" class="level3" data-number="3.5.3">
+<h3 data-number="3.5.3" class="anchored" data-anchor-id="entrenamiento-de-red-neuronal-2"><span class="header-section-number">3.5.3</span> Entrenamiento de Red Neuronal</h3>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="im">import</span> os <span class="im">import</span> pandas <span class="im">as</span> pd <span class="im">import</span> numpy <span class="im">as</span> np <span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt <span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a><span class="im">from</span> genetic_selection <span class="im">import</span> GeneticSelectionCV</span>
+<span id="cb2-4"><a href="#cb2-4"></a></span>
+<span id="cb2-5"><a href="#cb2-5"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler <span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split <span class="im">from</span> sklearn.metrics <span class="im">import</span> confusion_matrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><strong>Cargar datos de trabajo</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a></span>
+<span id="cb3-2"><a href="#cb3-2"></a>os.chdir(<span class="st">'C:/Users/p_san/Desktop/Máster_2020/Módulo_5'</span>) <span class="co">#directorio datos=pd.read_csv('german_credit.csv',encoding = 'ISO-8859-1', index_col=None)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Todas las variables son categóricas salvo:</p>
+<p>duration</p>
+<p>credit_amount</p>
+<p>residence_since</p>
+<p>age</p>
+<p>existing_credits</p>
+<p>num_dependents</p>
+<p>Conversión a variables categóricas</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a>datos\[<span class="st">'checking_status'</span>\]<span class="op">=</span>datos\[<span class="st">'checking_status'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'credit_history'</span>\]<span class="op">=</span>datos\[<span class="st">'credit_history'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'purpose'</span>\]<span class="op">=</span>datos\[<span class="st">'purpose'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'savings_status'</span>\]<span class="op">=</span>datos\[<span class="st">'savings_status'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'employment'</span>\]<span class="op">=</span>datos\[<span class="st">'employment'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'personal_status'</span>\]<span class="op">=</span>datos\[<span class="st">'personal_status'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'other_parties'</span>\]<span class="op">=</span>datos\[<span class="st">'other_parties'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'property_magnitude'</span>\]<span class="op">=</span>datos\[<span class="st">'property_magnitude'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'other_payment_plans'</span>\]<span class="op">=</span>datos\[<span class="st">'other_payment_plans'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'housing'</span>\]<span class="op">=</span>datos\[<span class="st">'housing'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'job'</span>\]<span class="op">=</span>datos\[<span class="st">'job'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'property_magnitude'</span>\]<span class="op">=</span>datos\[<span class="st">'property_magnitude'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'own_telephone'</span>\]<span class="op">=</span>datos\[<span class="st">'own_telephone'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'foreign_worker'</span>\]<span class="op">=</span>datos\[<span class="st">'foreign_worker'</span>\].astype(<span class="st">'category'</span>) datos\[<span class="st">'class'</span>\]<span class="op">=</span>datos\[<span class="st">'class'</span>\].astype(<span class="st">'category'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>La variable class es una variable reservada en diferentes módulos de Python -&gt; reemplazar por por target</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a>datos.rename(columns<span class="op">=</span>{<span class="st">'class'</span>: <span class="st">'target'</span>}, inplace<span class="op">=</span><span class="va">True</span>) datos\[<span class="st">'target'</span>\]<span class="op">=</span>np.where(datos\[<span class="st">'target'</span>\]<span class="op">==</span><span class="st">'good'</span>, <span class="dv">0</span>, <span class="dv">1</span>) \<span class="co"># cambio en la codificación por sencillez en el preprocesado</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Definición de la muestra de trabajo</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a>datos_entrada<span class="op">=</span>datos.drop(<span class="st">'target'</span>, axis<span class="op">=</span><span class="dv">1</span>) \<span class="co"># Datos de entrada datos_entrada= pd.get_dummies(datos_entrada, drop_first=True) #conversión a variables dummy</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>datos de salida</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a>respuesta<span class="op">=</span>datos.loc\[:, <span class="st">'target'</span>\]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Escalado de las variables, partición de la muestra y Cross Validation</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a>seed<span class="op">=</span><span class="dv">123</span> \<span class="co"># Escalado de los datos de entrada x_esc=StandardScaler().fit_transform(datos_entrada) x_esc=pd.DataFrame(x_esc, columns=datos_entrada.columns)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Partición de la muestra</p>
+<p>test_size=0.3 #muestra para el test x_train, x_test, y_train, y_test = train_test_split(x_esc,respuesta, test_size=test_size, random_state=seed, stratify=respuesta) Usando un modelo Cart from sklearn.tree import DecisionTreeClassifier cart=DecisionTreeClassifier(max_depth=5, random_state=seed) cart_algoritmo_gen=GeneticSelectionCV(cart, cv=5, # 5 particiones verbose=0, # no se muestran los resultados en la pantalla scoring=“roc_auc”, # ejemplo métrica para evaluar max_features=15, # número de variables máximas en la selección de<br>
+# características n_population=50, # tamaño de la población crossover_proba=0.5, # probabilidad de cruce entre parejas de genes mutation_proba=0.2, #probabilidad de mutación n_generations=40, #número de generaciones crossover_independent_proba=0.5, # prob. cruce para genes # independientes mutation_independent_proba=0.05, # prob. mutación de genes # independientes tournament_size=3, #tamaño de los grupos n_gen_no_change=10, # genes que se mantienen -&gt; no pasan a # la segunda generación caching=True, n_jobs=1)</p>
+<p>cart_algoritmo_gen=cart_algoritmo_gen.fit(x_train, y_train)<br>
+ajuste del modelo usando algoritmo genéticos para la selección de variables # Variables Seleccionadas print(‘Num. Var:’, cart_algoritmo_gen.n_features_) # print(cart_algoritmo_gen.support_)<br>
+# Resultados matriz numpy -&gt; mala visualización. Los resultados se # convierten a df de pandas df=pd.DataFrame(cart_algoritmo_gen.support_, columns=[‘Variables’], index=x_train.columns) df=df.loc[~df[‘Variables’].isin([False])] #se elimina del df las variables no seleccionadas por el algoritmo list(df.index) # variables seleccionadas por el algoritmo</p>
+<p>Num. Var: 9 [‘checking_status_0&lt;=X&lt;200’, ‘checking_status_&lt;0’, “credit_history_‘critical/other existing credit’”, “purpose_‘used car’”, ‘savings_status_&gt;=1000’, “personal_status_‘male single’”, ‘other_parties_guarantor’, ‘other_payment_plans_stores’, ‘job_skilled’]</p>
+<p>Resultados test - predicción &amp; Matriz de confusión (modelo CART con selección de variables a través de Algoritmos Genéticos)</p>
+<p>pred=cart_algoritmo_gen.predict(x_test)</p>
+<p>confusion_matrix(y_test, pred) # Matriz de confusión</p>
+<p>array([[173, 37], [ 46, 44]], dtype=int64)</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./capitulo2.html" class="pagination-link" aria-label="Modelos Gráficos Probabilísticos y Análisis Causal">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./capitulo4.html" class="pagination-link" aria-label="Lógica Difusa">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
