@@ -1,0 +1,166 @@
+## Principales arquitecturas y software de Deep Learning
+
+### Principales arquitecturas
+
+Actualmente existen muchos tipos de estructuras de redes neuronales artificiales dado que logran resultados extraordinarios en muchos campos del conocimiento. Los primeros éxitos en el aprendizaje profundo se lograron a través de las investigaciones y trabajos de Geoffre Hinton (2006) que introduce las Redes de Creencia Profunda en cada capa de la red de una Máquina de Boltzmann Restringida (RBM) para la asignación inicial de los pesos sinápticos. Hace tiempo que se está trabajando con arquitecturas como los Autoencoders, Hinton y Zemel (1994), las RBMs de Hinton y Sejnowski (1986) y las DBNs (Deep Belief Networks), Hinton et al. (2006) y otras como las redes recurrentes y convolucionales. Estas técnicas constituyen en sí mismas arquitecturas de redes neuronales, aunque también algunas de ellas, como se ha afirmado en la introducción, se están empleando para inicializar los pesos de arquitecturas profundas de redes neuronales supervisadas con conexiones hacia adelante.
+
+**Redes Convolucionales**
+
+Las redes neuronales convolucionales (CNNs) han transformado el panorama del Deep Learning, destacándose por su habilidad para extraer características de alto nivel a través de la operación de convolución. Diseñadas específicamente para el procesamiento de imágenes, las CNNs son altamente eficientes en tareas de clasificación y segmentación en el ámbito de la visión artificial.
+
+Inspiradas en el funcionamiento de la corteza visual del cerebro humano, estas redes representan una evolución del perceptrón multicapa. Aunque su uso se popularizó en la década de 1990 con el desarrollo de sistemas de lectura de cheques por parte de AT&T, las CNNs han experimentado una evolución significativa desde entonces.
+
+Su arquitectura se compone de capas de convolución, responsables de transformar los datos de entrada, y capas de pooling, encargadas de resumir la información relevante. Posteriormente, se aplican capas densamente conectadas para obtener el resultado final.
+
+El auge de las CNNs se vio impulsado por iniciativas como la competencia ILSVRC, que propiciaron avances considerables en este campo. Entre los modelos más destacados se encuentran LeNet-5, AlexNet, VGG, GoogLeNet y ResNet, muchos de los cuales están disponibles como modelos preentrenados para su integración en diversas aplicaciones. Estos modelos, con estructuras de capas más complejas, representan el estado del arte en reconocimiento visual y están al alcance de cualquier investigador interesado en el Deep Learning.
+
+Más allá de las arquitecturas conocidas, han surgido modelos más avanzados como DenseNet y EfficientNet, que optimizan el rendimiento y la eficiencia computacional. La transferencia de aprendizaje se ha convertido en una herramienta fundamental, permitiendo adaptar modelos preentrenados a tareas específicas con conjuntos de datos más pequeños, agilizando el entrenamiento y mejorando la generalización.
+
+Las CNNs encuentran un amplio uso en tareas de segmentación semántica y detección de objetos, impulsadas por técnicas como U-Net y Mask R-CNN. Adicionalmente, métodos de aprendizaje débilmente supervisado y autoetiquetado están permitiendo entrenar modelos con datos etiquetados de manera menos precisa o incluso sin etiquetar.
+
+Para mejorar la interpretabilidad de las CNNs, se han propuesto técnicas de visualización de atención visual, que permiten identificar las partes de una imagen que son más relevantes para la predicción del modelo.
+
+Estos avances impulsan el continuo desarrollo de las CNNs, expandiendo su aplicación a diversos campos como el diagnóstico médico, la conducción autónoma y la robótica. La investigación activa en este campo sigue explorando nuevas formas de mejorar la eficiencia, la precisión y la interpretabilidad de las CNNs para abordar desafíos cada vez más complejos en el procesamiento de imágenes y otros tipos de datos.
+
+**Autoencoders**
+
+Los Autoencoders (AE) son una clase de redes neuronales dentro del ámbito del Deep Learning, caracterizadas por su enfoque en el aprendizaje no supervisado. Aunque se mencionaron por primera vez en la década de 1980, ha sido en los últimos años donde han experimentado un notable interés y desarrollo. La arquitectura de un AE consiste en dos partes principales: el encoder y el decoder. El encoder se encarga de codificar o comprimir los datos de entrada, mientras que el decoder se encarga de regenerar los datos originales en la salida, lo que resulta en una estructura simétrica.
+
+Durante el entrenamiento, el AE aprende a reconstruir los datos de entrada en la capa de salida de la red, generalmente implementando restricciones como la reducción de elementos en las capas ocultas del encoder. Esto evita simplemente copiar la entrada en la salida y obliga al modelo a aprender representaciones más significativas de los datos. Entre las aplicaciones principales de los AE se encuentran la reducción de dimensiones y compresión de datos, la búsqueda de imágenes, la detección de anomalías y la eliminación de ruido.
+
+Además de los autoencoders estándar, existen varias variaciones que han surgido para abordar diferentes desafíos y aplicaciones específicas, como los Variational Autoencoders (VAE), los Sparse Autoencoders, los Denoising Autoencoders y los Contractive Autoencoders. Estas variaciones amplían el alcance y la versatilidad de los autoencoders en una variedad de contextos de aprendizaje automático, desde la compresión de datos hasta la generación de nuevas muestras y la detección de anomalías en conjuntos de datos complejos.
+
+**Redes Recurrentes**
+
+Las redes neuronales recurrentes (RNNs) revolucionaron el panorama del machine learning, posicionándose como una herramienta fundamental para procesar y analizar datos secuenciales. A diferencia de las redes neuronales tradicionales con una estructura de capas fija, las RNNs poseen una arquitectura flexible que les permite incorporar información del pasado, presente y futuro, lo que las convirtió en una gran apuesta ante tareas omo el procesamiento del lenguaje natural, el reconocimiento de voz y la predicción de series temporales.
+
+Gracias a su capacidad de memoria interna, las RNNs pueden capturar dependencias temporales en los datos secuenciales, una característica crucial para modelar el comportamiento de fenómenos que evolucionan con el tiempo. Esta característica las diferencia de las redes neuronales clásicas, que no tienen en cuenta el contexto temporal de la información.
+
+La familia de las RNNs abarca diversas arquitecturas, cada una con sus propias fortalezas y aplicaciones. Entre las más populares encontramos las redes de Elman, las redes de Jordan, las redes Long Short-Term Memory (LSTM) y las redes Gated Recurrent Unit (GRU) que, introducidas en 2015 son una alternativa más ligera y eficiente a las LSTM.
+
+El campo de las RNNs ha experimentado un rápido crecimiento en los últimos años, impulsado por avances en investigación y la disponibilidad de conjuntos de datos masivos. Entre las mejoras más notables encontramos las redes neuronales convolucionales recurrentes (CRNNs), las redes neuronales con atención y la integración del aprendizaje por refuerzo. Estas mejoras han ampliado aún más las capacidades de las RNNs, permitiéndolas abordar tareas cada vez más complejas y desafiantes.
+
+**Redes Generativas Adversarias**
+
+Las Generative Adversarial Networks (GAN) representan una innovadora aplicación del deep learning en la generación de contenido sintético, incluyendo imágenes, videos, música y caras extremadamente realistas. La arquitectura de una GAN consiste en dos componentes principales: un generador y un discriminador. El generador se encarga de crear nuevos datos sintéticos, como imágenes, a partir de un vector aleatorio en el espacio latente. Por otro lado, el discriminador tiene la tarea de distinguir entre datos reales y sintéticos, es decir, determinar si una imagen proviene del conjunto de datos original o si fue creada por el generador.
+
+El generador se implementa típicamente utilizando una red neuronal convolucional profunda, con capas especializadas que aprenden a generar características de imágenes en lugar de extraerlas de una imagen de entrada. Algunas de las capas más comunes utilizadas en el modelo del generador son la capa de muestreo (UpSampling2D) que duplica las dimensiones de la entrada, y la capa convolucional de transposición (Conv2DTranspose) que realiza una operación de convolución inversa para generar datos sintéticos.
+
+La idea clave detrás de las GAN es el entrenamiento adversarial, donde el generador y el discriminador compiten entre sí en un juego de suma cero. Mientras el generador trata de engañar al discriminador generando datos cada vez más realistas, el discriminador mejora su capacidad para distinguir entre datos reales y sintéticos. Este proceso de competencia continua lleva a la generación de datos sintéticos de alta calidad que son indistinguibles de los datos reales para el discriminador.
+
+En los últimos años, las GAN han experimentado avances significativos en términos de nuevas arquitecturas y técnicas de entrenamiento. Por ejemplo, se han desarrollado variantes como las Conditional GAN (cGAN), que permiten controlar las características de los datos generados, y las Progressive GAN (ProgGAN), que generan imágenes de mayor resolución de forma progresiva. Además, se han propuesto técnicas de regularización, como la penalización del gradiente o la normalización espectral, para mejorar la estabilidad y la calidad de las GAN generadas.
+
+Las GANs han abierto un abanico de posibilidades en diversos campos como el ámbito de la generación de texto así como aplicaciones en la realidad aumentada donde permiten integrar elementos sintéticos en el mundo real de forma realista, como la creación de avatares virtuales o la superposición de información sobre objetos físicos. Asimismo, de los videojuegos, las GANs se utilizan para desarrollar personajes, escenarios y objetos virtuales de alta calidad para experiencias de juego más inmersivas.
+
+**Boltzmann Machine y Restricted Boltzmann Machine**
+
+El aprendizaje de la denominada máquina de Boltzmann (BM) se realiza a través de un algoritmo estocástico que proviene de ideas basadas en la mecánica estadística. Este prototipo de red neuronal tiene una característica distintiva y es que el uso de conexiones sinápticas entre las neuronas es simétrico.
+
+Las neuronas son de dos tipos: visibles y ocultas. Las neuronas visibles son las que interactúan y proveen una interface entre la red y el ambiente en el que operan, mientras que las neuronas actúan libremente sin interacciones con el entorno. Esta máquina dispone de dos modos de operación. El primero es la condición de anclaje donde las neuronas están fijas por los estímulos específicos que impone el ambiente. El otro modo es la condición de libertad, donde tanto las neuronas ocultas como las visibles actúan libremente sin condiciones impuestas por el medio ambiente. Las maquinas restringidas de Boltzmann (RBM) solamente toman en cuenta aquellos modelos en los que no existen conexiones del tipo visible-visible y oculta-oculta. Estas redes también asumen que los datos de entrenamiento son independientes y están idénticamente distribuidos.
+
+Una forma de estimar los parámetros de un modelo estocástico es calculando la máxima verosimilitud. Para ello, se hace uso de los Markov Random Fiels (MRF), ya que al encontrar los parámetros que maximizan los datos de entrenamiento bajo una distribución MRF, equivale a encontrar los parámetros $\theta$ que maximizan la verosimilitud de los datos de entrenamiento, Fischer e Igel (2012). Maximizar dicha verosimilitud es el objetivo que persigue el algoritmo de entrenamiento de una RBM. A pesar de utilizar la distribución MRF, computacionalmente hablando se llega a ecuaciones inviables de implementar. Para evitar el problema anterior, las esperanzas que se obtienen de MRF pueden ser aproximadas por muestras extraídas de distribuciones basadas en las técnicas de Markov Chain Monte Carlo Techniques (MCMC). Las técnicas de MCMC utilizan un algoritmo denominado muestreo de Gibbs con el que obtenemos una secuencia de observaciones o muestras que se aproximan a partir de una distribución de verosimilitud de múltiples variables aleatorias. La idea básica del muestreo de Gibss es actualizar cada variable posteriormente en base a su distribución condicional dado el estado de las otras variables.
+
+**Deep Belief Network**
+
+Una red Deep Belief Network tal como demostró Hinton se puede considerar como un “apilamiento de redes restringidas de Boltzmann”. Tiene una estructura jerárquica que, como es sabido, es una de las características del deep learning. Como en el anterior modelo, esta red también es un modelo en grafo estocástico, que aprende a extraer una representación jerárquica profunda de los datos de entrenamiento. Cada capa de la RBM extrae un nivel de abstracción de características de los datos de entrenamiento, cada vez más significativo; pero para ello, la capa siguiente necesita la información de la capa anterior lo que implica el uso de las variables latentes.
+
+Estos modelos caracterizan la distribución conjunta $h_k$ entre el vector de observaciones *x* y las capas ocultas, donde $x=h_0$, es una distribución condicional para las unidades visibles limitadas sobre las unidades ocultas que pertenecen a la RBM en el nivel *k*, y es la distribución conjunta oculta visible en la red RBM del nivel superior o de salida.
+
+El entrenamiento de esta red puede ser híbrido, empezando por un entrenamiento no supervisado para después aplicar un entrenamiento supervisado para un mejor y más óptimo ajuste, aunque pueden aplicarse diferentes tipos de entrenamiento, Bengio et al. (2007) y Salakhutdinov (2014) Para realizar un entrenamiento no supervisado se aplica a las redes de creencia profunda con Redes restringidas de Boltzmann el método de bloque constructor que fue presentado por Hinton (2006) y por Bengio (2007).
+
+### Software
+
+Como se verá en los siguientes epígrafes, la opción preferida para este módulo de Deep Learning es el software llamado Keras que está programado en Python. En términos de eficiencia y de aprendizaje Keras presenta unas ventajas importantes que se especifican más adelante.
+
+Aunque nuestra preferencia a nivel formativo es el **uso de Keras y Tensorflow**, a continuación serán descritos los principales softwares con los que poder realizar implementaciones de arquitecturas de aprendizaje profundo: *TensorFlow*, *Keras*, *Pytorch*, *MXNET*, *Caffe* y *JAX*.
+
+Por su parte, también presentaremos **Colaboratory Environment (Colab)**, una herramienta de Google que dispone en la web y que no requiere ninguna instalación en nuestros ordenadores. Esta propuesta de Google resulta muy interesante dado que no requiere coste alguno, se puede ejecutar desde cualquier lugar aumentando nuestros recursos a la hora de trabajar con Deep Learning y admitiendo a su vez la implementación tanto de código Python como de R.
+
+**TensorFlow**
+
+TensorFlow es una biblioteca de código abierto para el cálculo numérico desarrollada por Google. Es una de las herramientas de Deep Learning más populares y ampliamente utilizadas, conocida por su flexibilidad, escalabilidad y comunidad activa. TensorFlow ofrece una amplia gama de funciones para construir, entrenar y desplegar modelos de Deep Learning, incluyendo:
+
+-   Soporte para una variedad de arquitecturas de redes neuronales: permite construir una amplia gama de arquitecturas de redes neuronales, desde redes convolucionales y recurrentes hasta modelos de atención y redes generativas adversarias (GANs)
+-   Escalabilidad a grandes conjuntos de datos: está diseñado para manejar grandes conjuntos de datos y puede distribuirse en múltiples GPUs o TPU para acelerar el entrenamiento de modelos
+-   Amplia gama de herramientas de visualización y depuración: proporciona una variedad de herramientas para visualizar y depurar modelos de Deep Learning, lo que facilita la identificación y resolución de problemas
+-   Gran comunidad y recursos: cuenta con una gran y activa comunidad de desarrolladores y usuarios que proporcionan soporte y comparten recursos
+
+**Pytorch**
+
+PyTorch es una biblioteca de código abierto para el aprendizaje automático desarrollada por Facebook. Es conocida por su sintaxis intuitiva y facilidad de uso, lo que la convierte en una opción popular para investigadores y desarrolladores principiantes. PyTorch ofrece características similares a TensorFlow, incluyendo:
+
+-   Soporte para una variedad de arquitecturas de redes neuronales: permite construir una amplia gama de arquitecturas de redes neuronales, desde redes convolucionales y recurrentes hasta modelos de atención y GANs
+-   Ejecución dinámica de gráficos: utiliza un motor de ejecución de gráficos dinámico, lo que permite modificar los modelos durante el entrenamiento, lo que facilita la experimentación y el ajuste fino
+-   Amplia gama de bibliotecas y herramientas de terceros: se beneficia de un ecosistema rico de bibliotecas y herramientas de terceros que amplían sus capacidades
+-   Facilidad de uso: tiene una sintaxis similar a Python, lo que la hace fácil de aprender y usar para desarrolladores con experiencia en Python
+
+**Keras**
+
+Keras es una biblioteca de código abierto para el aprendizaje automático de alto nivel que se ejecuta sobre TensorFlow o PyTorch. Es conocida por su simplicidad y facilidad de uso, lo que la convierte en una opción popular para principiantes y para desarrollar prototipos de modelos rápidamente. Keras ofrece una interfaz de alto nivel que abstrae las complejidades de las bibliotecas subyacentes, como TensorFlow o PyTorch, lo que permite a los usuarios centrarse en la construcción y el entrenamiento de modelos sin necesidad de profundizar en los detalles de implementación. Entre las principales características de Keras destaca:
+
+-   Simplicidad: tiene una sintaxis intuitiva y fácil de aprender, lo que la hace ideal para principiantes y para desarrollar prototipos de modelos rápidamente
+-   Facilidad de uso: ofrece una API de alto nivel que abstrae las complejidades de las bibliotecas subyacentes, como TensorFlow o PyTorch, lo que permite a los usuarios centrarse en la construcción y el entrenamiento de modelos sin necesidad de profundizar en los detalles de implementación
+-   Flexibilidad: permite construir una amplia gama de modelos de Deep Learning, desde redes neuronales convolucionales y recurrentes hasta modelos de atención y redes generativas adversarias (GANs)
+-   Modularidad: al ser una biblioteca modular que permite a los usuarios combinar diferentes componentes para construir sus modelos personalizados
+-   Soporte para múltiples plataformas: se puede utilizar en una variedad de plataformas, incluyendo Windows, macOS y Linux.
+
+**JAX**
+
+JAX, desarrollada por Google Research, se posiciona como una biblioteca de Python para el aprendizaje automático y el cálculo numérico, diseñada para ofrecer un rendimiento y una flexibilidad excepcionales, especialmente en el entrenamiento de modelos de deep learning en aceleradores como GPUs y TPUs.
+
+Su enfoque se basa en la composición de funciones puras y transformaciones automáticas de gradiente, lo que la convierte en una herramienta ideal para implementar algoritmos de aprendizaje automático diferenciables y de alto rendimiento. Entre sus características destacadas encontramos:
+
+-   Autodiferenciación: calcula automáticamente gradientes (autodiferenciación), simplificando el desarrollo de modelos de deep learning
+-   Composición eficiente de transformaciones: combina operaciones elementales en funciones compuestas para un procesamiento eficiente
+-   Integración con frameworks: se integra con frameworks de deep learning como TensorFlow y PyTorch, aprovechando las ventajas de cada uno
+-   Paralelización y distribución: permite ejecutar operaciones en paralelo y de manera distribuida, ideal para grandes conjuntos de datos
+-   Altas prestaciones para el entrenamiento de modelos: sobresale por su capacidad de computación de alto rendimiento, haciéndola ideal para entrenar modelos de deep learning complejos de manera eficiente. Así, se ha convertido en una opción atractiva para aquellos que manejan grandes conjuntos de datos y buscan optimizar el tiempo de entrenamiento
+-   Flexibilidad para la investigación y experimentación: facilita la implementación de nuevas arquitecturas y algoritmos, permitiendo explorar diferentes enfoques y optimizar el rendimiento de los modelos
+-   Personalización de flujos de trabajo: permite definir funciones y transformaciones personalizadas, proporcionando un control preciso sobre el pipeline de trabajo. Esto resulta útil para adaptar el proceso de entrenamiento a necesidades específicas y optimizar el rendimiento para tareas concretas
+
+**Mxnet**
+
+MXNet es una biblioteca de código abierto para el aprendizaje automático desarrollada por Apache Software Foundation. Es conocida por su escalabilidad, flexibilidad y soporte para múltiples lenguajes de programación, incluyendo Python, R y C++. MXNet ofrece características similares a TensorFlow y PyTorch, incluyendo:
+
+-   Soporte para una variedad de arquitecturas de redes neuronales: permite construir una amplia gama de arquitecturas de redes neuronales, desde redes convolucionales y recurrentes hasta modelos de atención y GANs
+-   Escalabilidad a grandes conjuntos de datos: está diseñado para manejar grandes conjuntos de datos y puede distribuirse en múltiples GPUs o TPU para acelerar el entrenamiento de modelos
+-   Soporte para múltiples lenguajes de programación: se puede utilizar con Python, R y C++, lo que lo hace accesible a una amplia gama de desarrolladores
+-   Flexibilidad: permite a los usuarios personalizar y extender la biblioteca para satisfacer sus necesidades específicas
+
+**Caffe**
+
+Caffe es un marco de código abierto para el aprendizaje profundo desarrollado por la Universidad de California, Berkeley. Es conocido por su simplicidad, velocidad y eficiencia, lo que lo convierte en una opción popular para aplicaciones de Deep Learning en tiempo real. Caffe ofrece características similares a TensorFlow y PyTorch, incluyendo:
+
+-   Soporte para una variedad de arquitecturas de redes neuronales: permite construir una amplia gama de arquitecturas de redes neuronales, desde redes convolucionales y recurrentes hasta modelos de atención y GANs
+-   Entrenamiento rápido y eficiente: está optimizado para el rendimiento y la eficiencia, lo que lo hace ideal para aplicaciones de aprendizaje profundo
+
+#### Google Colab
+
+El entorno Colab (Google Colaboratory) es una potente herramienta de google para ejecutar código incluido el deep Dearning y que está disponible en la web (<https://colab.research.google.com/>). Se ha desarrollado para Python, pero actualmente también se puede ejecutar código de R. Esta funcionalidad puede importar un conjunto de datos de imágenes, entrenar un clasificador con este conjunto de datos y evaluar el modelo con tan solo usar unas pocas líneas de código. Los cuadernos de Colab ejecutan código en los servidores en la nube de Google, lo que nos permite aprovechar la potencia del hardware de Google, incluidas las GPU y TPU, independientemente de la potencia de tu equipo. Lo único que se necesita es un navegador.
+
+Con Colab se puede aprovechar toda la potencia de las bibliotecas más populares de Python para analizar y visualizar datos. La celda de código de abajo utiliza NumPy para generar datos aleatorios y Matplotlib para visualizarlos. Para editar el código, solo se tiene que hacer clic en la celda.
+
+![Google Colab](imagenes/capitulo1/colab_1.png){#fig-colab_1]
+
+Este es el menú principal de colab desde donde podemos gestionar nuestros proyectos:
+
+![Google Colab Nuevo](imagenes/capitulo1/colab_nuevo_fichero.png){#fig-colab_nuevo_fichero]
+
+Desde el `menú Archivo`, como en la mayor parte de los programas, podemos llevar a cabo las operaciones habituales de abrir y guardar los ficheros en diferentes formatos. En este caso se pueden abrir ficheros de Jupyter/Python desde cualquier dispositivo externo, desde el repositorio Drive o de Github:
+
+![Importación a Google Colab](imagenes/capitulo1/colab_importa.png){#fig-colab_importa]
+
+Si queremos subir un fichero que tenemos en nuestro ordenador vamos a `Archivo/Subir` cuaderno y podemos elegir nuestro archivo cuando se despliegue la siguiente pantalla:
+
+
+![Abrir Google Colab](imagenes/capitulo1/colab_importa_archivo.png){#fig-colab_importa_archivo]
+
+Como se ha comentado también se pueden importar archivos desde GitHub introduciendo la url de GitHub:
+
+
+![Seleccionar Fichero](imagenes/capitulo1/colab_importa_github.png){#fig-colab_importa_github]
+
+Por último, *colab* nos permite tener acceso tanto a GPUs de forma como a CPUs más potentes que nuestro ordenador de escritorio de forma gratuita.
+
+
+![Ejecutar Notebook Google Colab](imagenes/capitulo1/colab_entorno_ejecucion_inicio.png){#fig-colab_entorno_ejecucion_inicio]

@@ -1,0 +1,19 @@
+# Deep Learning
+
+{{< include introduccion_deep_learning.qmd >}}
+
+{{< include arquitecturas_software.qmd >}}
+
+{{< include redes_neuronales.qmd >}}
+
+{{< include redes_convolucionales.qmd >}}
+
+{{< include redes_recurrentes.qmd >}}
+
+{{< include autoencoders.qmd >}}
+
+{{< include arquitecturas_preentrenadas.qmd >}}
+
+{{< include reinforcement_learning.qmd >}}
+
+

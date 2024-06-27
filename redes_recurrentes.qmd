@@ -1,0 +1,7 @@
+## Redes Recurrentes
+
+## Redes recurrentes: Elman, Jordan, LSTM y GRU
+
+### Forecasting en series de tiempo
+
+### Clasificación y generación de textos

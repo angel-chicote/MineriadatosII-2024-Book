@@ -1,0 +1,1024 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Módulo 8. Minería de Datos II - 4&nbsp; Lógica Difusa</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./capitulo3.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-sidebar floating">% Para el pseudocodigo
+<script>
+MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./capitulo4.html"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Módulo 8. Minería de Datos II</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introducción</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Deep Learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo2.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo4.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#contexto-y-conceptos-clave" id="toc-contexto-y-conceptos-clave" class="nav-link active" data-scroll-target="#contexto-y-conceptos-clave"><span class="header-section-number">4.1</span> Contexto y conceptos clave</a>
+  <ul class="collapse">
+  <li><a href="#operaciones-sobre-conjuntos-difusos" id="toc-operaciones-sobre-conjuntos-difusos" class="nav-link" data-scroll-target="#operaciones-sobre-conjuntos-difusos"><span class="header-section-number">4.1.1</span> Operaciones sobre conjuntos difusos</a></li>
+  <li><a href="#funciones-de-membresía-y-modelamiento-difuso" id="toc-funciones-de-membresía-y-modelamiento-difuso" class="nav-link" data-scroll-target="#funciones-de-membresía-y-modelamiento-difuso"><span class="header-section-number">4.1.2</span> Funciones de membresía y modelamiento difuso</a></li>
+  </ul></li>
+  <li><a href="#ejemplos-prácticos" id="toc-ejemplos-prácticos" class="nav-link" data-scroll-target="#ejemplos-prácticos"><span class="header-section-number">4.2</span> Ejemplos prácticos</a></li>
+  <li><a href="#fuzzy-c-means" id="toc-fuzzy-c-means" class="nav-link" data-scroll-target="#fuzzy-c-means"><span class="header-section-number">4.3</span> Fuzzy C-Means</a></li>
+  <li><a href="#fuzzy-matching" id="toc-fuzzy-matching" class="nav-link" data-scroll-target="#fuzzy-matching"><span class="header-section-number">4.4</span> Fuzzy Matching</a>
+  <ul class="collapse">
+  <li><a href="#ejemplo-1" id="toc-ejemplo-1" class="nav-link" data-scroll-target="#ejemplo-1"><span class="header-section-number">4.4.1</span> Ejemplo 1</a></li>
+  <li><a href="#ejemplo-2" id="toc-ejemplo-2" class="nav-link" data-scroll-target="#ejemplo-2"><span class="header-section-number">4.4.2</span> Ejemplo 2</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="contexto-y-conceptos-clave" class="level2" data-number="4.1">
+<h2 data-number="4.1" class="anchored" data-anchor-id="contexto-y-conceptos-clave"><span class="header-section-number">4.1</span> Contexto y conceptos clave</h2>
+<p>La lógica difusa tiene un origen que se remonta a la antigua Grecia con Aristóteles, quien ya proponía la idea de grados de verdad o falsedad. Sin embargo, su desarrollo significativo ocurrió en el siglo XVIII, con filósofos como David Hume y Charles Sander Pierce, quienes exploraron conceptos como el razonamiento basado en la experiencia y la idea de vaguedad en lugar de la dicotomía cierto-falso.</p>
+<p>El verdadero punto de inflexión llegó en 1962 con Lotfi Zadeh, quien cuestionó la rigidez de las matemáticas tradicionales frente a la imprecisión y las verdades parciales. Su trabajo en la Universidad de California en Berkeley condujo al concepto de conjuntos difusos, que generalizan los conjuntos tradicionales para trabajar con expresiones imprecisas, una noción inspirada en una discusión sobre la belleza de sus respectivas esposas.</p>
+<p>Desde entonces, la lógica difusa ha encontrado aplicaciones prácticas en campos como el control de sistemas, la ingeniería y la inteligencia artificial. Ebrahim Mandani y Lauritz Peter Holmbland desarrollaron sistemas de control difuso prácticos en los años 70, mientras que en Japón se produjo un rápido avance en el uso de la lógica difusa en una amplia gama de aplicaciones, desde sistemas de transporte hasta electrodomésticos inteligentes.</p>
+<p>La importancia de la lógica difusa radica en su capacidad para modelar la incertidumbre y la imprecisión en la toma de decisiones, permitiendo sistemas más adaptables y eficientes en numerosas aplicaciones. Se fundamenta en los conjuntos difusos y un sistema de inferencia basado en reglas, lo que ofrece una manera elegante de abordar problemas con información vaga o incompleta. En contraste con la lógica tradicional, que emplea conceptos absolutos, la lógica difusa permite grados variables de pertenencia a los conjuntos, imitando así el razonamiento humano.</p>
+<p>Se definen a continuación los principales conceptos:</p>
+<ul>
+<li><p><strong>Lógica Difusa</strong>: es un sistema matemático que modela funciones no lineales, que convierte unas entradas en salidas acorde con los planteamientos lógicos que usan el razonamiento aproximado.</p></li>
+<li><p><strong>Lógica Difusa en Inteligencia Artificial</strong>: método de razonamiento de máquina similar al pensamiento humano, que puede procesar información incompleta o incierta, característico de muchos sistemas expertos. Con la lógica difusa o borrosa se puede gobernar un sistema por medio de reglas de “sentido común” las cuales se refieren a cantidades indefinidas. En general, la lógica difusa se puede aplicar tanto a sistemas de control como para modelar cualquier sistema continuo de ingeniería, física, biología o economía.</p></li>
+<li><p><strong>Conjuntos difusos</strong>: son conjuntos que permiten la representación de la imprecisión y la incertidumbre. A diferencia de los conjuntos tradicionales, donde un elemento pertenece o no pertenece al conjunto de manera precisa, en los conjuntos difusos un elemento puede pertenecer al conjunto en diferentes grados. Por ejemplo, en lugar de definir un conjunto “alto” como una altura mayor a 180 cm, se podría definir de manera difusa, permitiendo grados de “altitud” para alturas que no son completamente altas o completamente bajas.</p></li>
+<li><p><strong>Sistema de Inferencia Difuso</strong>: es el componente de la lógica difusa que utiliza reglas lingüísticas para mapear las entradas difusas a salidas difusas. Estas reglas se expresan en la forma “SI…ENTONCES…”, donde se especifica cómo se relacionan las variables de entrada con las de salida. Por ejemplo, una regla en un sistema de control de climatización podría ser: “SI la temperatura es FRÍA y la humedad es ALTA, ENTONCES aumentar la calefacción”.</p></li>
+<li><p><strong>Fuzzificación</strong>: es el proceso de convertir entradas nítidas o precisas en valores difusos. Por ejemplo, en un sistema de control de velocidad de un automóvil, la entrada “velocidad del vehículo” puede ser fuzzificada para representar grados de “lento”, “medio” o “rápido”, en lugar de valores exactos de velocidad.</p></li>
+<li><p><strong>Defuzzificación</strong>: es el proceso inverso de fuzzificación, donde se convierten las salidas difusas en valores nítidos o precisos. Después de que el sistema de inferencia difuso ha producido una salida difusa basada en las reglas y las entradas, la defuzzificación asigna un valor preciso a esa salida difusa.</p></li>
+<li><p><strong>Funciones de Pertenencia</strong>: son funciones matemáticas que describen la membresía de un elemento a un conjunto difuso. Estas funciones determinan cómo se distribuyen los grados de pertenencia dentro del conjunto difuso. Algunas funciones comunes son las funciones triangulares, trapezoidales y gaussianas, que modelan diferentes formas de incertidumbre.</p></li>
+<li><p><strong>Variable lingüística</strong>: es una variable cuyos valores se expresan en términos lingüísticos o en palabras en lugar de valores numéricos precisos. Estos términos lingüísticos se utilizan para describir la incertidumbre o la imprecisión asociada con la variable y pueden incluir etiquetas como “bajo”, “medio” y “alto” en lugar de valores numéricos específicos. Al utilizar términos lingüísticos en lugar de valores numéricos precisos, los sistemas difusos pueden manejar de manera más efectiva la información subjetiva y no lineal existente en el mundo real.</p></li>
+</ul>
+<section id="operaciones-sobre-conjuntos-difusos" class="level3" data-number="4.1.1">
+<h3 data-number="4.1.1" class="anchored" data-anchor-id="operaciones-sobre-conjuntos-difusos"><span class="header-section-number">4.1.1</span> Operaciones sobre conjuntos difusos</h3>
+<p>Las operaciones sobre conjuntos difusos son operaciones matemáticas que se realizan sobre conjuntos difusos para obtener nuevos conjuntos difusos. Las operaciones sobre conjuntos difusos se pueden clasificar en dos categorías principales:</p>
+<ul>
+<li><p><strong>Operaciones Unarias</strong>: se aplican a un solo conjunto difuso y generan un nuevo conjunto difuso como resultado. Algunas de las operaciones unarias más comunes son:</p>
+<ul>
+<li><p><code>Negación</code>: la negación de un conjunto difuso <em>A</em>, denotada como <span class="math inline">\(¬A\)</span>, se obtiene complementando la función de pertenencia de <em>A</em>. En otras palabras, para todo elemento <em>x</em> en el universo de discurso, <span class="math inline">\(\mu ¬A(x) = 1 - \mu A(x)\)</span>.</p></li>
+<li><p><code>Inversión</code>: la inversión de un conjunto difuso <em>A</em> se obtiene invirtiendo la función de pertenencia de <em>A</em>. En otras palabras, para todo elemento <em>x</em> en el universo de discurso, <span class="math inline">\(\mu A^{x} = [1 - \mu A(x)]^n\)</span>, donde <em>n</em> es un parámetro que controla la forma de la inversión.</p></li>
+<li><p><code>Concentración</code>: la concentración de un conjunto difuso <em>A</em>, denotada como <em>C(A)</em>, se obtiene estrechando la función de pertenencia de A alrededor de sus valores máximos. En otras palabras, para todo elemento x en el universo de discurso, <span class="math inline">\(\mu C(A)(x) = f(\mu A(x))\)</span>, donde <em>f</em> es una función creciente que acerca los valores de <span class="math inline">\(\mu A(x)\)</span> a 1.</p></li>
+<li><p><code>Dilatación</code>: La dilatación de un conjunto difuso <em>A</em>, denotada como <em>D(A)</em>, se obtiene ampliando la función de pertenencia de <em>A</em>. En otras palabras, para todo elemento <em>x</em> en el universo de discurso, <span class="math inline">\(\mu D(A)(x) = g(\mu A(x))\)</span>, donde <em>g</em> es una función decreciente que aleja los valores de <span class="math inline">\(\mu A(x)\)</span> de 1.</p></li>
+</ul></li>
+<li><p><strong>Operaciones Binarias</strong>: se aplican a dos conjuntos difusos y generan un nuevo conjunto difuso como resultado. Algunas de las operaciones binarias más comunes son:</p>
+<ul>
+<li><p><code>Intersección</code>: la intersección de dos conjuntos difusos <em>A</em> y <em>B</em>, denotada como <span class="math inline">\(A ∩ B\)</span>, se obtiene como el conjunto difuso que contiene solo los elementos que pertenecen tanto a <em>A</em> como a <em>B</em>. En otras palabras, para todo elemento x en el universo de discurso, <span class="math inline">\(\mu A∩B(x) = min(\mu A(x), µB(x))\)</span>.</p></li>
+<li><p><code>Unión</code>: La unión de dos conjuntos difusos <em>A</em> y <em>B</em>, denotada como <span class="math inline">\(A ∪ B\)</span>, se obtiene como el conjunto difuso que contiene todos los elementos que pertenecen a <em>A</em>, a <em>B</em> o a ambos. En otras palabras, para todo elemento <em>x</em> en el universo de discurso, <span class="math inline">\(\mu A∪B(x) = max(\mu A(x), \mu B(x))\)</span>.</p></li>
+<li><p><code>Complemento</code>: ll complemento de un conjunto difuso <em>A</em>, denotado como <span class="math inline">\(A^C\)</span>, se obtiene como el conjunto difuso que contiene todos los elementos que no pertenecen a <em>A</em>. En otras palabras, para todo elemento <em>x</em> en el universo de discurso, <span class="math inline">\(\mu A^C(x) = 1 - \mu A(x)\)</span>.</p></li>
+<li><p><code>Composición</code>: la composición de dos conjuntos difusos <em>A</em> y <em>B</em>, denotada como <em>A</em> o <em>B</em>, se obtiene como el conjunto difuso que representa la “relación” entre <em>A</em> y <em>B</em>. La definición precisa de la composición depende del tipo de conjuntos difusos y la aplicación específica.</p></li>
+</ul></li>
+</ul>
+<p><strong>Propiedades de las Operaciones sobre Conjuntos Difusos</strong></p>
+<p>Las operaciones sobre conjuntos difusos generalmente satisfacen ciertas propiedades matemáticas que garantizan su consistencia y aplicabilidad. Algunas de las propiedades comunes son:</p>
+<ul>
+<li><p><code>Asociatividad</code>: la asociación de las operaciones define el orden en que se realizan las operaciones. Por ejemplo, para la intersección: <span class="math inline">\((A ∩ B) ∩ C = A ∩ (B ∩ C)\)</span></p></li>
+<li><p><code>Conmutatividad</code>: el orden de los operandos no afecta el resultado de la operación. Por ejemplo, para la unión: <span class="math inline">\(A ∪ B = B ∪ A\)</span></p></li>
+<li><p><code>Distributividad</code>: la distribución de una operación sobre otra define cómo se combinan las operaciones. Por ejemplo, para la distribución de la unión sobre la intersección: <span class="math inline">\(A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C)\)</span></p></li>
+<li><p><code>Absorción</code>: la absorción de una operación por otra define cómo un elemento neutro afecta el resultado</p></li>
+</ul>
+<section id="t-normas-y-t-conormas" class="level4" data-number="4.1.1.1">
+<h4 data-number="4.1.1.1" class="anchored" data-anchor-id="t-normas-y-t-conormas"><span class="header-section-number">4.1.1.1</span> T-normas y T-conormas</h4>
+<p>Las <strong>T-normas</strong> y <strong>T-conormas</strong> son operadores fundamentales que permiten combinar información difusa y obtener un resultado difuso. Estas operaciones juegan un papel esencial en la intersección y unión de conjuntos difusos.</p>
+<ul>
+<li><strong>T-normas</strong>: es una función binaria que combina dos valores difusos en un nuevo valor difuso. Se representa como T(a, b), donde a y b son valores difusos entre 0 y 1. Las T-normas se caracterizan por las siguientes propiedades:
+<ul>
+<li>Monotonicidad: T(a1, b1) ≤ T(a2, b2) si a1 ≤ a2 y b1 ≤ b2.</li>
+<li>Conmutatividad: T(a, b) = T(b, a).</li>
+<li>Asociatividad: T(T(a1, a2), b) = T(a1, T(a2, b)).</li>
+<li>Neutralidad: T(a, 1) = a para todo a entre 0 y 1.</li>
+</ul></li>
+</ul>
+<p>Las <em>T-normas</em> más destacadas son: - <code>Producto T-norma</code>: <span class="math inline">\(T(a, b) = a * b\)</span>. Es la T-norma más común y representa la “intersección” difusa - <code>Mínima T-norma</code>: <span class="math inline">\(T(a, b) = min(a, b)\)</span>. Representa la “mínima” entre dos valores difusos - <code>Diferencia limitada (o de Lukasiewick)</code>: <span class="math inline">\(T(a, b) = max(0, a + b - 1)\)</span>.</p>
+<ul>
+<li><strong>T-conormas</strong>: es una función binaria que combina dos valores difusos en un nuevo valor difuso. Se representa como C(a, b), donde a y b son valores difusos entre 0 y 1. Las T-conormas se caracterizan por las siguientes propiedades:
+<ul>
+<li>Monotonicidad: C(a1, b1) ≥ C(a2, b2) si a1 ≤ a2 y b1 ≤ b2.</li>
+<li>Conmutatividad: C(a, b) = C(b, a).</li>
+<li>Asociatividad: C(C(a1, a2), b) = C(a1, C(a2, b)).</li>
+<li>Neutralidad: C(a, 0) = a para todo a entre 0 y 1.</li>
+</ul></li>
+</ul>
+<p>Las <em>T-conormas</em> más destacadas son: - <code>Producto T-conorma</code>: <span class="math inline">\(C(a, b) = a + b - a * b\)</span>. Es la T-conorma más común y representa la “unión” difusa - <code>Máxima T-norma</code>: <span class="math inline">\(T(a, b) = max(a, b)\)</span>. Representa la “máxima” entre dos valores difusos - <code>Suma limitada (o de Lukasiewick)</code>: <span class="math inline">\(T(a, b) = min(a + b, 1)\)</span>.</p>
+<p>A continuación diferentes ejemplos para facilitar la interpretación de estos conceptos:</p>
+<p><em>Producto T-norma (a = 0.7, b = 0.5)</em></p>
+<blockquote class="blockquote">
+<p>Considera un sistema que evalúa la idoneidad de un candidato para un trabajo basado en dos criterios: habilidades técnicas y habilidades de comunicación. Cada criterio se evalúa en una escala de 0 a 1, donde 0 representa ninguna habilidad y 1 representa habilidades excepcionales. Se tienen así lo siguientes valores para cada criterio:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li>a = 0.7 representa la calificación de habilidades técnicas del candidato (70% sobre 100%)</li>
+<li>b = 0.5 representa la calificación de habilidades de comunicación del candidato (50% sobre 100%)</li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p>Interpretación: aplicando la Producto T-norma (T(0.7, 0.5) = 0.35) indica que la idoneidad general del candidato, considerando tanto habilidades técnicas como de comunicación, es del 35%. Esto sugiere que la idoneidad general del candidato es menor que sus calificaciones individuales de habilidades, reflejando la naturaleza “intersectada” de la T-norma.</p>
+</blockquote>
+<p><em>Mínimo T-norma (a = 0.8, b = 0.3)</em></p>
+<blockquote class="blockquote">
+<p>Imagina un sistema que evalúa el riesgo de una inversión financiera basado en dos factores: volatilidad del mercado y estabilidad económica. Cada factor se evalúa en una escala de 0 a 1, donde 0 representa ningún riesgo y 1 representa alto riesgo. Se tienen así lo siguientes valores para cada criterio:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li>a = 0.8 representa la calificación de volatilidad del mercado (80% sobre 100%)</li>
+<li>b = 0.3 representa la calificación de estabilidad económica (30% sobre 100%)</li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p>Interpretación: aplicando la Mínimo T-norma (T(0.8, 0.3) = 0.3) indica que el riesgo general de la inversión, considerando tanto factores de mercado como económicos, es del 30%. Esto sugiere que el riesgo general está determinado por el factor de calificación más baja (estabilidad económica), reflejando la naturaleza “mínima” de la T-norma.</p>
+</blockquote>
+<p><em>Producto T-Conorma (a = 0.4, b = 0.7)</em></p>
+<blockquote class="blockquote">
+<p>Considera un sistema que evalúa el éxito potencial de una campaña de marketing basado en dos factores: conocimiento de marca y atractivo del producto. Cada factor se evalúa en una escala de 0 a 1, donde 0 representa ningún potencial y 1 representa alto potencial. Se tienen así lo siguientes valores para cada criterio:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li>a = 0.4 representa la calificación de conocimiento de marca (40% sobre 100%)</li>
+<li>b = 0.7 representa la calificación de atractivo del producto (70% sobre 100%)</li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p>Interpretación: aplicando el Producto T-conorma (C(0.4, 0.7) = 0.82) indica que el éxito potencial general de la campaña, considerando tanto factores de marca como de producto, es del 82%. Esto sugiere que el potencial general es mayor que las calificaciones individuales, reflejando la naturaleza de “unión” de la T-conorma</p>
+</blockquote>
+<p><em>Máximo T-conorma (a = 0.6, b = 0.8)</em></p>
+<blockquote class="blockquote">
+<p>Imagina un sistema que evalúa la efectividad de un tratamiento médico experimental basado en dos criterios: reducción del dolor y mejora de la movilidad. Cada criterio se evalúa en una escala de 0 a 1, donde 0 representa ninguna mejora y 1 representa una mejora significativa. Se tienen así lo siguientes valores para cada criterio:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li>a = 0.6 representa la reducción del dolor obtenida con el tratamiento (60% de mejora)</li>
+<li>b = 0.8 representa la mejora de la movilidad lograda con el tratamiento (80% de mejora)</li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p>Interpretación: aplicando el máximo T-conorma (C(0.6, 0.8) = 0.8) indica que la efectividad general del tratamiento, considerando tanto la reducción del dolor como la mejora de la movilidad, es del 80%. Esto sugiere que la efectividad general está determinada por el factor de calificación más alto (mejora de la movilidad), reflejando la naturaleza de “máximo” de la T-conorma.</p>
+</blockquote>
+</section>
+</section>
+<section id="funciones-de-membresía-y-modelamiento-difuso" class="level3" data-number="4.1.2">
+<h3 data-number="4.1.2" class="anchored" data-anchor-id="funciones-de-membresía-y-modelamiento-difuso"><span class="header-section-number">4.1.2</span> Funciones de membresía y modelamiento difuso</h3>
+<section id="funciones-de-membresía" class="level4" data-number="4.1.2.1">
+<h4 data-number="4.1.2.1" class="anchored" data-anchor-id="funciones-de-membresía"><span class="header-section-number">4.1.2.1</span> Funciones de membresía</h4>
+<p>La <strong>función de membresía</strong> representa la asociación entre un elemento y un conjunto difuso, asignando un grado de pertenencia a dicho elemento en relación con el conjunto difuso. En otras palabras, una función de membresía describe cómo un elemento pertenece a un conjunto difuso en un continuo que va desde 0 (no pertenencia) hasta 1 (pertenencia total).</p>
+<p>Imaginemos que medimos la temperatura de una vivienda y queremos analizar el nivel de frío. De forma difusa se podría definir una función de membresía como la presentada en la imagen:</p>
+<div id="fig-funcion_membresia_ejemplo" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-funcion_membresia_ejemplo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo4/funcion_membresia_ejemplo.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-funcion_membresia_ejemplo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.1: Ejemplo Funciones Membresia
+</figcaption>
+</figure>
+</div>
+<p>Existen diferentes funciones de membresía, las más destacadas son:</p>
+<ul>
+<li><p><strong>Triangular</strong>: esta función de membresía se caracteriza por tener una forma triangular. Tiene tres parámetros principales: <em>a</em>, <em>b</em> y <em>c</em>, que definen los límites del triángulo en el eje <em>x</em> donde <em>a</em> es el punto de inicio del triángulo, <em>b</em> es el punto medio y <em>c</em> es el punto final. La función aumenta linealmente desde 0 hasta 1, alcanzando su máximo en <em>𝑏</em> y luego disminuye linealmente hasta 0. Es ampliamente utilizada debido a su simplicidad y facilidad de interpretación.</p></li>
+<li><p><strong>Trapezoidal</strong>: la función de membresía trapezoidal tiene cuatro parámetros principales: <em>a</em>, <em>b</em>, <em>c</em> y <em>d</em>, que definen los límites del trapecio en el eje <em>x</em>. La función aumenta linealmente desde 0 hasta 1 entre <em>a</em> y <em>b</em>, permanece constante en 1 entre <em>b</em> y <em>c</em>, y luego disminuye linealmente hasta 0 entre <em>c</em> y <em>d</em>. Esta función es útil cuando se necesita modelar conjuntos con rangos más amplios o cuando se requiere un grado de pertenencia constante en un intervalo.</p></li>
+<li><p><strong>Gaussiana</strong>: la función de membresía gaussiana tiene una forma de campana y se utiliza comúnmente para representar variables que tienen una distribución normal. Esta función tiene dos parámetros principales: <span class="math inline">\(\mu\)</span>, que representa la media de la distribución y <span class="math inline">\(\sigma\)</span> que controla su anchura de la distribución. A medida que <em>x</em> se aleja de <span class="math inline">\(\mu\)</span> el grado de pertenencia disminuye gradualmente. La función gaussiana es útil para modelar conjuntos con distribuciones simétricas y para suavizar transiciones entre conjuntos difusos.</p></li>
+<li><p><strong>Sigmoidal</strong>: se utiliza para representar relaciones no lineales entre variables. Esta función tiene tres parámetros principales: <em>a</em>, <em>b</em> y <em>c</em>, que controlan la pendiente y la posición de la curva sigmoidal. A medida que <em>x</em> aumenta desde <em>a</em> hasta <em>b</em> el grado de pertenencia aumenta gradualmente. Luego, a medida que <em>x</em> aumenta desde <em>b</em> hasta <em>c</em> el grado de pertenencia disminuye gradualmente. La función sigmoidal es útil para modelar relaciones complejas entre conjuntos difusos y es especialmente importante en problemas de inferencia difusa y control difuso.</p></li>
+</ul>
+<div id="fig-funciones_membresia" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-funciones_membresia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo4/funciones_membresia.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-funciones_membresia-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;4.2: Funciones Membresia
+</figcaption>
+</figure>
+</div>
+</section>
+<section id="modelado-difuso" class="level4" data-number="4.1.2.2">
+<h4 data-number="4.1.2.2" class="anchored" data-anchor-id="modelado-difuso"><span class="header-section-number">4.1.2.2</span> Modelado difuso</h4>
+<p>El <strong>modelado difuso</strong> implica la creación de un sistema que puede interpretar y procesar información imprecisa o incierta mediante reglas lingüísticas. En este contexto, las reglas se componen de antecedentes y consecuentes.</p>
+<ul>
+<li><strong>Antecedentes</strong>: son las condiciones o variables de entrada que se evalúan para determinar qué acciones o decisiones tomar. Estos antecedentes se expresan en términos lingüísticos, como “temperatura fría” o “velocidad rápida”.</li>
+</ul>
+<p>El antecedente se expresa mediante una función de pertenencia difusa <span class="math inline">\(\mu_A(x)\)</span>, donde <em>A</em> es el nombre del antecedente y <em>x</em> es el valor de la variable de entrada. Así, si <em>A</em> es la temperatura y <em>x</em> es el valor de la temperatura en grados Celsius entonces <span class="math inline">\(\mu_A(x)\)</span> podría representar el grado de pertenencia de <em>x</em> a la categoría “frío”, “templado” o “caliente”.</p>
+<ul>
+<li><strong>Consecuentes</strong>: son las acciones o decisiones que se toman en respuesta a las condiciones evaluadas en los antecedentes. Estos consecuentes también se expresan en términos lingüísticos y representan las salidas del sistema difuso. En el ejemplo del sistema de control de clima, los consecuentes podrían ser ajustes en el sistema de calefacción, ventilación o aire acondicionado.</li>
+</ul>
+<p>Existen diferentes modelamientos de consecuentes, los más destacados son:</p>
+<ul>
+<li><p><code>Mamdani</code>: los consecuentes de las reglas difusas se expresan como funciones de pertenencia difusas. Estas funciones representan la contribución de cada regla al resultado final del sistema difuso. Por lo general, estas funciones son conjuntos difusos que se solapan entre sí, lo que significa que una regla puede contribuir parcialmente al resultado final del sistema. Por ejemplo, si tenemos un conjunto de reglas difusas del tipo <em>SI temperatura es fría Y humedad es alta ENTONCES activar calefacción</em>, el consecuente para esta regla podría expresarse como una función de pertenencia difusa <span class="math inline">\(\mu_C(y)\)</span>, donde <em>y</em> es el valor de la salida. Así, esta función de pertenencia podría representar la intensidad de la calefación.</p></li>
+<li><p><code>Sugeno</code>: los consecuentes de las reglas difusas se expresan como funciones lineales de la forma <span class="math inline">\(y = ax + b\)</span>, donde <em>x</em> es el valor de la entrada e <em>y</em> es el valor de la salida. En lugar de producir conjuntos difusos como en el enfoque de Mamdani, las reglas Sugeno generan un valor numérico preciso como resultado; lo que hace que el enfoque de Sugeno sea más adecuado para aplicaciones donde se requiere una salida numérica clara y no una respuesta lingüística. Así, continuando con el ejemplo anterior, <em>SI temperatura es fría Y humedad es alta ENTONCES activar calefacción con intensidad 0.7</em>, el consecuente para esta regla podría expresarse como <span class="math inline">\(y=0.7x\)</span>.</p></li>
+<li><p><code>Tsukamoto</code>: los consecuentes se expresan como funciones de pertenencia escalonadas. Estas funciones asignan un grado de pertenencia a diferentes conjuntos difusos de salida en función de la evaluación de los antecedentes. El enfoque de Tsukamoto es útil cuando se necesita un sistema de control que pueda adaptarse a cambios en las condiciones de entrada de manera suave y gradual.</p></li>
+</ul>
+<div style="text-align:center;">
+<p><span class="math display">\[ y = \frac{{\sum_{i=1}^{n} \mu_{A_i}(x_i) \cdot \text{V}_i}}{{\sum_{i=1}^{n} \mu_{A_i}(x_i)}} \]</span></p>
+</div>
+<p>donde <span class="math inline">\(y\)</span> es el valor de salida, <span class="math inline">\(\mu_A(x)\)</span> es la función de pertenencia difusa del antecedente <span class="math inline">\(A_i\)</span> evaluada en el valor de entrada, <span class="math inline">\(V_i\)</span> es el valor asociado al consecuente para el antecedente <span class="math inline">\(A_i\)</span> y <em>n</em> es el número de antecedentes en la regla</p>
+<p>Esta fórmula calcula el valor de salida <em>𝑦</em> como una combinación ponderada de los valores asociados <span class="math inline">\(V_i\)</span> para cada antecedente, donde los pesos están determinados por las funciones de pertenencia de los antecedentes. La suma de las funciones de pertenencia de los antecedentes normaliza el resultado, asegurando que esté en el rango adecuado.</p>
+<blockquote class="blockquote">
+<p>Estas fórmulas proporcionan una manera matemática de expresar los antecedentes y consecuentes en un sistema de lógica difusa, lo que permite modelar y controlar sistemas basados en reglas lingüísticas y condiciones difusas.</p>
+</blockquote>
+<p>La salida de un sistema difuso es, por tanto, un conjunto difuso. En cambio, los sistemas de control se relacionan con el mundo externo a través de valores exactos lo que implica, a la hora de hacer inferencia, es necesario realizar un proceso de <strong>defuzzificación</strong>. Así, los principales métodos de defuzzificación son:</p>
+<ul>
+<li><code>Centroide</code>: calcula el centro de gravedad del conjunto difuso ponderado. Consiste en encontrar el punto en el eje de salida donde el área bajo la curva del conjunto difuso es dividida en dos áreas iguales. Matemáticamente, el valor de salida <em>y</em> se calcula como</li>
+</ul>
+<div style="text-align:center;">
+<p><span class="math display">\[ y = \frac{{\sum_{i=1}^{n} u_i \cdot x_i}}{{\sum_{i=1}^{n} u_i}} \]</span></p>
+</div>
+<ul>
+<li><p><code>Máximo Valor de Membresía</code>: selecciona el valor de salida con el grado de membresía más alto. Es decir, el valor de salida es el punto en el conjunto difuso donde la membresía es máxima. Así, <span class="math inline">\(y = max(u(x)\)</span></p></li>
+<li><p><code>Media de los Máximos</code>: se calcula la media de todos los puntos en el conjunto difuso donde el grado de membresía es máximo. Es útil cuando hay múltiples picos en el conjunto difuso</p></li>
+<li><p><code>Primera Máxima y Última Máxima</code>: se selecciona el primer y último punto de máximo grado de membresía, respectivamente, como valores de salida</p></li>
+<li><p><code>Bisectriz</code>: este método divide el conjunto difuso en dos áreas de igual tamaño y toma el punto medio entre los dos puntos de intersección de la bisectriz con el conjunto difuso</p></li>
+</ul>
+</section>
+</section>
+</section>
+<section id="ejemplos-prácticos" class="level2" data-number="4.2">
+<h2 data-number="4.2" class="anchored" data-anchor-id="ejemplos-prácticos"><span class="header-section-number">4.2</span> Ejemplos prácticos</h2>
+<p>Para ilustrar un ejemplo de control de sistemas difuso, consideremos un sistema difuso simple para controlar la potencia de un calefactor basado en la temperatura ambiente. Supongamos que queremos mantener la temperatura en una habitación alrededor de un valor de referencia.</p>
+<p><strong>Definición de las Variables Difusas</strong> - <code>Temperatura</code>: esta variable representa la temperatura medida en grados Celsius. Creamos una variable de entrada temperatura que abarca valores desde 0 hasta 100 grados Celsius. - <code>Potencia</code>: esta variable representa el nivel de potencia de la calefacción. Creamos una variable de salida potencia que también abarca valores desde 0 hasta 100.</p>
+<p><strong>Funciones de Membresía</strong> - <code>Temperatura</code>: se definen tres funciones de membresía para la temperatura: “fría”, “templada” y “caliente”. - <code>Potencia</code>: de igual forma, se definen tres funciones de membresía para la potencia de la calefacción: “baja”, “media” y “alta”.</p>
+<p><strong>Reglas difusas</strong> Se define el sistema de reglas difusas: - Si la temperatura es fría, entonces la potencia debe ser alta - Si la temperatura es alta, entonces la potencia debe ser baja - Si la temperatura es templada, entonces la potencia debe ser media</p>
+<p><strong>Sistema de Control</strong> Se crea un conjunto de reglas difusas a partir de cada una de las reglas definidas previsamente. Este conjunto de reglas representa el conocimiento difuso que guiará el comportamiento del sistema de control.</p>
+<p><strong>Controlador Difuso</strong> Se crea un controlador difuso que toma como argumento el sistema de control difuso creado anteriormente. Este controlador simula el comportamiento del sistema de control difuso y nos permite introducir valores de entrada (temperatura) para obtener el valor de salida (potencia) correspondiente.</p>
+<p><strong>Simulación</strong> Se simula un cambio en la temperatura estableciendo un valor para la variable de entrada temperatura en el controlador difuso. Luego, se calcula el valor de salida (nivel de potencia) utilizando el método compute() del controlador.</p>
+<p>Finalmente, el código python:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> skfuzzy <span class="im">as</span> fuzz</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">from</span> skfuzzy <span class="im">import</span> control <span class="im">as</span> ctrl</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a><span class="co"># Definición de las variables de entrada y salida</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>temperatura <span class="op">=</span> ctrl.Antecedent(np.arange(<span class="dv">0</span>, <span class="dv">101</span>, <span class="dv">1</span>), <span class="st">'temperatura'</span>)</span>
+<span id="cb1-7"><a href="#cb1-7"></a>potencia <span class="op">=</span> ctrl.Consequent(np.arange(<span class="dv">0</span>, <span class="dv">101</span>, <span class="dv">1</span>), <span class="st">'potencia'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8"></a></span>
+<span id="cb1-9"><a href="#cb1-9"></a><span class="co"># Definición de las funciones de membresía para la temperatura</span></span>
+<span id="cb1-10"><a href="#cb1-10"></a>temperatura[<span class="st">'fría'</span>] <span class="op">=</span> fuzz.trimf(temperatura.universe, [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">50</span>])</span>
+<span id="cb1-11"><a href="#cb1-11"></a>temperatura[<span class="st">'templada'</span>] <span class="op">=</span> fuzz.trimf(temperatura.universe, [<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">100</span>])</span>
+<span id="cb1-12"><a href="#cb1-12"></a>temperatura[<span class="st">'caliente'</span>] <span class="op">=</span> fuzz.trimf(temperatura.universe, [<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">100</span>])</span>
+<span id="cb1-13"><a href="#cb1-13"></a></span>
+<span id="cb1-14"><a href="#cb1-14"></a><span class="co"># Definición de las funciones de membresía para la potencia</span></span>
+<span id="cb1-15"><a href="#cb1-15"></a>potencia[<span class="st">'baja'</span>] <span class="op">=</span> fuzz.trimf(potencia.universe, [<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">50</span>])</span>
+<span id="cb1-16"><a href="#cb1-16"></a>potencia[<span class="st">'media'</span>] <span class="op">=</span> fuzz.trimf(potencia.universe, [<span class="dv">0</span>, <span class="dv">50</span>, <span class="dv">100</span>])</span>
+<span id="cb1-17"><a href="#cb1-17"></a>potencia[<span class="st">'alta'</span>] <span class="op">=</span> fuzz.trimf(potencia.universe, [<span class="dv">50</span>, <span class="dv">100</span>, <span class="dv">100</span>])</span>
+<span id="cb1-18"><a href="#cb1-18"></a></span>
+<span id="cb1-19"><a href="#cb1-19"></a><span class="co"># Reglas difusas</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>regla1 <span class="op">=</span> ctrl.Rule(temperatura[<span class="st">'fría'</span>], potencia[<span class="st">'alta'</span>])</span>
+<span id="cb1-21"><a href="#cb1-21"></a>regla2 <span class="op">=</span> ctrl.Rule(temperatura[<span class="st">'templada'</span>], potencia[<span class="st">'media'</span>])</span>
+<span id="cb1-22"><a href="#cb1-22"></a>regla3 <span class="op">=</span> ctrl.Rule(temperatura[<span class="st">'caliente'</span>], potencia[<span class="st">'baja'</span>])</span>
+<span id="cb1-23"><a href="#cb1-23"></a></span>
+<span id="cb1-24"><a href="#cb1-24"></a><span class="co"># Sistema de control difuso</span></span>
+<span id="cb1-25"><a href="#cb1-25"></a>sistema_control <span class="op">=</span> ctrl.ControlSystem([regla1, regla2, regla3])</span>
+<span id="cb1-26"><a href="#cb1-26"></a>controlador <span class="op">=</span> ctrl.ControlSystemSimulation(sistema_control)</span>
+<span id="cb1-27"><a href="#cb1-27"></a></span>
+<span id="cb1-28"><a href="#cb1-28"></a><span class="co"># Simulación de un cambio en la temperatura</span></span>
+<span id="cb1-29"><a href="#cb1-29"></a>controlador.<span class="bu">input</span>[<span class="st">'temperatura'</span>] <span class="op">=</span> <span class="dv">25</span>  <span class="co"># Temperatura medida en grados Celsius</span></span>
+<span id="cb1-30"><a href="#cb1-30"></a></span>
+<span id="cb1-31"><a href="#cb1-31"></a><span class="co"># Computar el resultado</span></span>
+<span id="cb1-32"><a href="#cb1-32"></a>controlador.compute()</span>
+<span id="cb1-33"><a href="#cb1-33"></a></span>
+<span id="cb1-34"><a href="#cb1-34"></a><span class="co"># Visualización del resultado</span></span>
+<span id="cb1-35"><a href="#cb1-35"></a><span class="bu">print</span>(<span class="st">"Nivel de potencia de la calefacción:"</span>, controlador.output[<span class="st">'potencia'</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A continuación, se representan e interpretan la funciones de membresía antecedente y consecuente del sistema de control:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Detalle de las funciones de membresía (antecedente y consecuente)</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a></span>
+<span id="cb2-3"><a href="#cb2-3"></a>temperatura.view(sim<span class="op">=</span>controlador) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a>potencia.view(sim<span class="op">=</span>controlador)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="fuzzy-c-means" class="level2" data-number="4.3">
+<h2 data-number="4.3" class="anchored" data-anchor-id="fuzzy-c-means"><span class="header-section-number">4.3</span> Fuzzy C-Means</h2>
+<p>Los algoritmos de clustering difuso, como el Fuzzy C-Means (FCM), son esenciales en la agrupación de datos donde la pertenencia de un punto a un clúster no es binaria, sino que se modela como un grado de pertenencia difuso. FCM asigna a cada punto un grado de pertenencia a todos los clústeres, lo que permite una representación más flexible de la estructura de los datos. En lugar de asignar cada punto a un único clúster, FCM asigna grados de pertenencia que indican la probabilidad de que un punto pertenezca a cada clúster. Esto es especialmente útil cuando los datos pueden pertenecer a múltiples clústeres simultáneamente, o cuando la frontera entre clústeres no es clara. La importancia de los algoritmos de clustering difuso radica en su capacidad para manejar la incertidumbre en los datos y proporcionar una agrupación más completa y flexible que los métodos tradicionales de clustering.</p>
+<blockquote class="blockquote">
+<p>A diferencia del algoritmo C-Means clásico, que trabaja con una partición dura, FCM realiza una partición suave del conjunto de datos. En tal partición los datos pertenecen en algún grado a todos los clusters.</p>
+</blockquote>
+<p>El siguiente código muestra cómo hacer un C-Means difuso:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb4-2"><a href="#cb4-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb4-3"><a href="#cb4-3"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb4-4"><a href="#cb4-4"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb4-5"><a href="#cb4-5"></a><span class="im">import</span> skfuzzy <span class="im">as</span> fuzz</span>
+<span id="cb4-6"><a href="#cb4-6"></a><span class="im">from</span> sklearn <span class="im">import</span> datasets</span>
+<span id="cb4-7"><a href="#cb4-7"></a></span>
+<span id="cb4-8"><a href="#cb4-8"></a><span class="co"># Carga de datos de Iris desde scikit-learn</span></span>
+<span id="cb4-9"><a href="#cb4-9"></a>iris <span class="op">=</span> datasets.load_iris()</span>
+<span id="cb4-10"><a href="#cb4-10"></a>X <span class="op">=</span> iris.data  <span class="co"># Características</span></span>
+<span id="cb4-11"><a href="#cb4-11"></a>y <span class="op">=</span> iris.target  <span class="co"># Etiquetas</span></span>
+<span id="cb4-12"><a href="#cb4-12"></a></span>
+<span id="cb4-13"><a href="#cb4-13"></a><span class="co"># Gráfico de dispersión para visualizar los clusters originales según las dos primeras características (sépalo)</span></span>
+<span id="cb4-14"><a href="#cb4-14"></a>g <span class="op">=</span> sns.scatterplot(x<span class="op">=</span>X[:, <span class="dv">0</span>], y<span class="op">=</span>X[:, <span class="dv">1</span>], hue<span class="op">=</span>y, palette<span class="op">=</span><span class="st">"Set2"</span>)</span>
+<span id="cb4-15"><a href="#cb4-15"></a>plt.title(<span class="st">'Sépalo: longitud vs tamaño'</span>), plt.xlabel(<span class="st">'Longitud'</span>), plt.ylabel(<span class="st">'Ancho'</span>)</span>
+<span id="cb4-16"><a href="#cb4-16"></a>plt.show()</span>
+<span id="cb4-17"><a href="#cb4-17"></a></span>
+<span id="cb4-18"><a href="#cb4-18"></a><span class="co"># Algoritmo Fuzzy C-Means</span></span>
+<span id="cb4-19"><a href="#cb4-19"></a><span class="co"># Es necesario que los datos estén en un array 2D, por lo que se utiliza la función "reshape"</span></span>
+<span id="cb4-20"><a href="#cb4-20"></a>X2 <span class="op">=</span> np.reshape(X.T, (X.shape[<span class="dv">1</span>], X.shape[<span class="dv">0</span>]))  <span class="co"># Cambio de forma de los datos</span></span>
+<span id="cb4-21"><a href="#cb4-21"></a></span>
+<span id="cb4-22"><a href="#cb4-22"></a><span class="co"># Aplicación del modelo Fuzzy C-Means</span></span>
+<span id="cb4-23"><a href="#cb4-23"></a>cntr, u, u0, d, jm, p, fpc <span class="op">=</span> fuzz.cluster.cmeans(X2, c<span class="op">=</span><span class="dv">3</span>, m<span class="op">=</span><span class="dv">2</span>, error<span class="op">=</span><span class="fl">0.005</span>, maxiter<span class="op">=</span><span class="dv">1000</span>, init<span class="op">=</span><span class="va">None</span>, seed<span class="op">=</span><span class="dv">111</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Entre los parámetros que devuelve la función <code>fuzz.cluster.cmeans</code> se pueden citar: - <code>cntr</code> es el centro de los clusters - <code>u</code> es el grado de membresía - <code>u0</code> es la matriz inicial de membresía - <code>d</code> es la matriz de distancias euclidiana</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="co"># Centro de los clusters</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>cluster_centers_df <span class="op">=</span> pd.DataFrame(cntr, columns<span class="op">=</span>[<span class="st">'Longitud Sépalo'</span>, <span class="st">'Ancho Sépalo'</span>, <span class="st">'Longitud Pétalo'</span>, <span class="st">'Ancho Pétalo'</span>],</span>
+<span id="cb5-3"><a href="#cb5-3"></a>                                  index<span class="op">=</span>[<span class="st">'Cluster 1'</span>, <span class="st">'Cluster 2'</span>, <span class="st">'Cluster 3'</span>])</span>
+<span id="cb5-4"><a href="#cb5-4"></a>cluster_centers_df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="co"># Grados de membresía (probabilidad de pertenencia a cada cluster)</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>membership_df <span class="op">=</span> pd.DataFrame(u.T, columns<span class="op">=</span>[<span class="st">'Cluster 1'</span>, <span class="st">'Cluster 2'</span>, <span class="st">'Cluster 3'</span>])</span>
+<span id="cb6-3"><a href="#cb6-3"></a>membership_df.head()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Gráfico de dispersión para visualizar los clusters obtenidos</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>g <span class="op">=</span> sns.scatterplot(x<span class="op">=</span>X[:, <span class="dv">0</span>], y<span class="op">=</span>X[:, <span class="dv">1</span>], hue<span class="op">=</span>np.argmax(u.T, axis<span class="op">=</span><span class="dv">1</span>), palette<span class="op">=</span><span class="st">"Set2"</span>)  <span class="co"># Asignación de colores según cluster</span></span>
+<span id="cb7-3"><a href="#cb7-3"></a>plt.title(<span class="st">'Sépalo: longitud vs tamaño'</span>), plt.xlabel(<span class="st">'Longitud'</span>), plt.ylabel(<span class="st">'Ancho'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="fuzzy-matching" class="level2" data-number="4.4">
+<h2 data-number="4.4" class="anchored" data-anchor-id="fuzzy-matching"><span class="header-section-number">4.4</span> Fuzzy Matching</h2>
+<p>El <strong>Fuzzy Matching</strong> es una técnica utilizada para comparar cadenas de texto y determinar su grado de similitud, incluso cuando hay diferencias ortográficas, tipográficas u otras variaciones entre ellas. Esta técnica identifica la probabilidad de que dos registros sean realmente coincidentes en función de si coinciden o no en diferentes identificadores. Los identificadores elegidos y el peso asignado constituyen la base de la <em>Concordancia Difusa</em>. Así, cuando los parámetros son demasiado amplios, se encontrarán más coincidencias, pero también aumentarán las posibilidades de “falsos positivos”.</p>
+<p>Existen diversas métricas a utilizar en Fuzzy Matching siendo la más destacada la <code>distancia de Levenshtein</code> pero existen otras como se indican a continuación:</p>
+<ul>
+<li><code>Distancia de Levenshtein</code>: mide el número mínimo de operaciones necesarias para convertir una cadena en otra. Las operaciones incluyen inserción, eliminación o sustitución de caracteres</li>
+<li><code>Distancia Damerau-Levenshtein</code>: similar a la distancia de Levenshtein, pero también considera la transposición de caracteres adyacentes como una operación válida</li>
+<li><code>Distancia Jaro-Winkler</code>: diseñada para comparar cadenas de texto cortas, tiene en cuenta la frecuencia de los caracteres y la posición de las coincidencias comunes</li>
+<li><code>Distancia del teclado</code>: evalúa la similitud entre dos cadenas basándose en la proximidad de las teclas en un teclado estándar</li>
+<li><code>Distancia Kullback-Leibler</code>: utilizada en comparaciones de cadenas de texto que representan distribuciones de probabilidad</li>
+</ul>
+<blockquote class="blockquote">
+<p>La <strong>concordancia difusa</strong> es crucial para identificar similitudes entre registros, permitiendo la gestión eficiente de datos duplicados. La distancia de Levenshtein es fundamental en este proceso, al calcular la diferencia entre dos cadenas de caracteres, siendo especialmente útil para detectar errores ortográficos y variaciones en la escritura. Más sobre Distancia de Levenshtein en el siguiente enlace: <a href="https://es.wikipedia.org/wiki/Distancia_de_Levenshtein" class="uri">https://es.wikipedia.org/wiki/Distancia_de_Levenshtein</a></p>
+</blockquote>
+<section id="ejemplo-1" class="level3" data-number="4.4.1">
+<h3 data-number="4.4.1" class="anchored" data-anchor-id="ejemplo-1"><span class="header-section-number">4.4.1</span> Ejemplo 1</h3>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="im">from</span> fuzzywuzzy <span class="im">import</span> fuzz</span>
+<span id="cb8-2"><a href="#cb8-2"></a></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="co"># Función para comparar nombres completos</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">def</span> comparar_nombres(nombre1, nombre2):</span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="co"># Usamos el ratio completo para comparar nombres</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    ratio <span class="op">=</span> fuzz.ratio(nombre1.lower(), nombre2.lower())</span>
+<span id="cb8-7"><a href="#cb8-7"></a>    <span class="cf">return</span> ratio</span>
+<span id="cb8-8"><a href="#cb8-8"></a></span>
+<span id="cb8-9"><a href="#cb8-9"></a><span class="co"># Ejemplo de comparación de nombres</span></span>
+<span id="cb8-10"><a href="#cb8-10"></a>nombre1 <span class="op">=</span> <span class="st">"Juan Pérez"</span></span>
+<span id="cb8-11"><a href="#cb8-11"></a>nombre2 <span class="op">=</span> <span class="st">"Juan Pérez Gómez"</span></span>
+<span id="cb8-12"><a href="#cb8-12"></a>nombre3 <span class="op">=</span> <span class="st">"Pedro López"</span></span>
+<span id="cb8-13"><a href="#cb8-13"></a>nombre4 <span class="op">=</span> <span class="st">"María Pérez Gómez"</span></span>
+<span id="cb8-14"><a href="#cb8-14"></a></span>
+<span id="cb8-15"><a href="#cb8-15"></a><span class="bu">print</span>(<span class="st">"Comparación de nombres completos:"</span>)</span>
+<span id="cb8-16"><a href="#cb8-16"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre1<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>nombre2<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_nombres(nombre1, nombre2)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-17"><a href="#cb8-17"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre1<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>nombre3<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_nombres(nombre1, nombre3)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb8-18"><a href="#cb8-18"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>nombre2<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>nombre4<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_nombres(nombre2, nombre4)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="ejemplo-2" class="level3" data-number="4.4.2">
+<h3 data-number="4.4.2" class="anchored" data-anchor-id="ejemplo-2"><span class="header-section-number">4.4.2</span> Ejemplo 2</h3>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="co"># Función para comparar direcciones de vivienda</span></span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="kw">def</span> comparar_direcciones(direccion1, direccion2):</span>
+<span id="cb9-3"><a href="#cb9-3"></a>    <span class="co"># Usamos el ratio parcial para comparar direcciones</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>    ratio <span class="op">=</span> fuzz.partialratio(direccion1.lower(), direccion2.lower())</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="cf">return</span> ratio</span>
+<span id="cb9-6"><a href="#cb9-6"></a></span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># Ejemplo de comparación de direcciones</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>direccion1 <span class="op">=</span> <span class="st">"123 Calle Principal, Madrid"</span></span>
+<span id="cb9-9"><a href="#cb9-9"></a>direccion2 <span class="op">=</span> <span class="st">"245 Calle Principal, Madrid"</span></span>
+<span id="cb9-10"><a href="#cb9-10"></a>direccion3 <span class="op">=</span> <span class="st">"456 Calle Secundaria, Ávila"</span></span>
+<span id="cb9-11"><a href="#cb9-11"></a>direccion4 <span class="op">=</span> <span class="st">"123 Calle Principal, Ávila"</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a></span>
+<span id="cb9-13"><a href="#cb9-13"></a><span class="bu">print</span>(<span class="st">"</span><span class="ch">\n</span><span class="st">Comparación de direcciones de vivienda:"</span>)</span>
+<span id="cb9-14"><a href="#cb9-14"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>direccion1<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>direccion2<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_direcciones(direccion1, direccion2)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-15"><a href="#cb9-15"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>direccion1<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>direccion3<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_direcciones(direccion1, direccion3)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>direccion2<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>direccion4<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_direcciones(direccion2, direccion4)<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="bu">print</span>(<span class="ss">f"</span><span class="sc">{</span>direccion3<span class="sc">}</span><span class="ss"> vs </span><span class="sc">{</span>direccion4<span class="sc">}</span><span class="ss">: </span><span class="sc">{</span>comparar_direcciones(direccion3, direccion4)<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>En la biblioteca <strong>fuzzywuzzy</strong>, las funciones <code>ratio()</code> y <code>partial_ratio()</code> se utilizan para calcular la similitud entre dos cadenas de texto. La diferencia principal radica en cómo se realiza la comparación y qué tan flexible es cada método en términos de coincidencia.</p>
+<ul>
+<li><code>ratio()</code>: esta función calcula la similitud entre dos cadenas comparándolas en su totalidad. Compara las cadenas carácter por carácter y devuelve un valor que representa la similitud entre las dos cadenas en términos de coincidencia exacta. Es útil cuando se busca una coincidencia exacta entre las cadenas y se prefiere una comparación estricta.</li>
+<li><code>partial_ratio()</code>: esta función calcula la similitud entre dos cadenas tomando en cuenta solo una parte de las mismas. Se utiliza para buscar subcadenas que coincidan parcialmente entre las cadenas de texto. Esto significa que puede ser más útil cuando se enfrenta a casos donde las cadenas pueden tener variaciones menores o cuando se desea encontrar coincidencias incluso si las cadenas difieren en longitud o tienen diferencias menores.</li>
+</ul>
+<p>Entonces, para decidir cuál usar, considera la naturaleza de los datos y el nivel de flexibilidad para realizar la comparación. Suele usarse <code>ratio()</code> cuando se necesita una comparación estricta y quieras asegurarte de que las cadenas coincidan exactamente; mientras que <code>partial_ratio()</code> se emplea cuando se buscan coincidencias parciales o flexibles entre las cadenas (p.e: cuando solo importan importa una parte específica de las mismas).</p>
+
+
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./capitulo3.html" class="pagination-link" aria-label="Algoritmos Genéticos">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

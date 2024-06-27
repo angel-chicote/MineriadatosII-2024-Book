@@ -1,0 +1,170 @@
+project:
+  type: book
+
+book:
+  title: "Módulo 8. Minería de Datos II"
+  subtitle: "Curso Modular Big Data y Data Science Aplicados a la Economía y a la Administración y Dirección de Empresas"
+  author:
+    - "Pablo Sánchez Cabrera"
+    - "Ángel Rodríguez Chicote"
+    - "Alfonso Carabantes Álamo"
+  date: "2024"
+  
+  output-file: "MineriaDatosII-2024"
+  # portada en html
+  cover-image: imagenes/portada.png 
+
+  
+  chapters:
+    - index.qmd
+    - capitulo1.qmd # Deep learning
+    - capitulo2.qmd # Bayes Análisis causal
+    - capitulo3.qmd # Genéticos
+    - capitulo4.qmd # Lógica Difusa
+    #- references.qmd
+  #appendices:
+  #  - anexo1.qmd
+
+#bibliography: references.bib
+
+format:
+  html:
+    theme: cosmo
+    highlight-style: tango
+    include-in-header: 
+      text: |
+        % Para el pseudocodigo
+        <script>
+        MathJax = {
+          loader: {
+            load: ['[tex]/boldsymbol']
+          },
+          tex: {
+            tags: "all",
+            inlineMath: [['$','$'], ['\\(','\\)']],
+            displayMath: [['$$','$$'], ['\\[','\\]']],
+            processEscapes: true,
+            processEnvironments: true,
+            packages: {
+              '[+]': ['boldsymbol']
+            }
+          }
+        };
+        </script>
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  pdf:
+    cite-method: biblatex
+    highlight-style: tango
+    code-line-numbers: true
+    keep-tex: true
+    papersize: a4
+    geometry:
+      - top=28mm
+      - bottom=30mm
+      - left=15mm
+      - right=15mm
+
+    toc-depth: 3
+    toc-title: Índice
+    include-in-header: 
+      text: |
+
+
+        \usepackage{makeidx}
+        \makeindex
+        
+        % Poner el texto adecuado por delante
+        \renewcommand{\figurename}{Imagen}
+        \renewcommand{\tablename}{Tabla}
+        
+
+        % Formatear el Capitulo, sección y subsección
+        \setkomafont{chapter}{\normalfont\huge\sffamily\bfseries\color{blue}}
+        \setkomafont{section}{\normalfont\LARGE\sffamily\bfseries\color{blue}}
+        \setkomafont{subsection}{\normalfont\Large\sffamily\bfseries\color{blue}}
+
+        % Para poder cambiar la tabla contenidos
+        %\setkomafont{disposition}{\normalfont}
+        %\RedeclareSectionCommands[
+        %    tocentryformat=\usekomafont{\bfseries\color{blue}},
+        %    tocpagenumberformat=\usekomafont{\bfseries\color{blue}}
+        %  ]{chapter,section,subsection,subsubsection,paragraph,subparagraph}
+        
+      
+        % Formatear tabla contenidos el Capitulo, sección y subsección
+        \setkomafont{chapterentry}{\bfseries\color{blue}}
+        \setkomafont{chapterentrydots}{\color{blue}}
+        \setkomafont{chapterentrypagenumber}{\color{blue}}
+
+        %\setkomafont{disposition}{\normalfont}        
+        %\setkomafont {partentry}{ \usekomafont{sectionentry}} 
+        %\setkomafont {partentrypagenumber}{ \usekomafont{sectionentrypagenumber}} 
+        %\setkomafont{sectionentry}{\color{blue}}
+        %\setkomafont{sectionentrydots}{\color{blue}}
+        %\setkomafont{sectionentrypagenumber}{\color{blue}}
+
+
+        
+        % Para las cabeceras y pies (sin la líneas en las cabeceras, usaremos tcolorbox)
+        \usepackage{scrlayer-scrpage}
+        \pagestyle{scrheadings}
+        
+        % Misma cabecera y pie en página de Capiutlo
+        \renewcommand*{\chapterpagestyle}{scrheadings}
+        
+        % Para que luego se ponga correctamente el nombre del capitulo
+        \automark[chapter]{chapter}
+        
+
+    include-before-body: 
+      text: |
+        \renewcommand{\figurename}{Imagen}
+        % Activar líneas en cabecera y pie
+        %\KOMAoptions{headsepline=true, headtopline=true footsepline=true,footbotline=true}
+        
+        
+    include-after-body: 
+      text: |
+        \printindex
+
+        
+    header-includes: |
+      % Para seudocodigo
+      \usepackage{algpseudocode}
+      
+      % Página portada
+      \titlehead{\center{\includegraphics[]{imagenes/PortadaCompleta.png}}}
+      %\title{\includegraphics[]{imagenes/organizadores_colaborador.png} }
+      
+ 
+      % Reorganizar lineas de código largas
+      \usepackage{fvextra}
+      \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+      
+      % Colocar elementos en Cabecera y pie
+      % Ponemos box
+      \cehead[]{
+              %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+              \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+               Minería de datos II  \hfill    \leftmark
+              \end{tcolorbox}} 
+
+      \cohead[]{              
+              %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+              \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+               Minería de datos II    \hfill    \leftmark 
+              \end{tcolorbox}} 
+              
+      \cofoot[]{              
+              %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+              \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+               \hfill -\thepage - \hfill
+              \end{tcolorbox}}   
+      \cefoot[]{              
+              %\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+              \begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black]
+                \hfill -\thepage - \hfill
+              \end{tcolorbox}}  
+  
+editor: visual
+

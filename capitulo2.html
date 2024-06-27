@@ -1,0 +1,1878 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.4.550">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Módulo 8. Minería de Datos II - 2&nbsp; Modelos Gráficos Probabilísticos y Análisis Causal</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./capitulo3.html" rel="next">
+<link href="./capitulo1.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+</head><body class="nav-sidebar floating">% Para el pseudocodigo
+<script>
+MathJax = {
+  loader: {
+    load: ['[tex]/boldsymbol']
+  },
+  tex: {
+    tags: "all",
+    inlineMath: [['$','$'], ['\\(','\\)']],
+    displayMath: [['$$','$$'], ['\\[','\\]']],
+    processEscapes: true,
+    processEnvironments: true,
+    packages: {
+      '[+]': ['boldsymbol']
+    }
+  }
+};
+</script>
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+
+
+
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./capitulo2.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="button" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">Módulo 8. Minería de Datos II</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Introducción</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo1.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Deep Learning</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo2.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo3.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./capitulo4.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Lógica Difusa</span></span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#redes-bayesianas" id="toc-redes-bayesianas" class="nav-link active" data-scroll-target="#redes-bayesianas"><span class="header-section-number">2.1</span> Redes Bayesianas</a>
+  <ul class="collapse">
+  <li><a href="#modelo-naive-bayes-hipótesis-map-y-teorema-de-bayes" id="toc-modelo-naive-bayes-hipótesis-map-y-teorema-de-bayes" class="nav-link" data-scroll-target="#modelo-naive-bayes-hipótesis-map-y-teorema-de-bayes"><span class="header-section-number">2.1.1</span> Modelo Naive Bayes: Hipótesis Map y Teorema de Bayes</a></li>
+  <li><a href="#modelo-naive-bayes" id="toc-modelo-naive-bayes" class="nav-link" data-scroll-target="#modelo-naive-bayes"><span class="header-section-number">2.1.2</span> Modelo Naive-Bayes</a></li>
+  </ul></li>
+  <li><a href="#modelos-bayesianos" id="toc-modelos-bayesianos" class="nav-link" data-scroll-target="#modelos-bayesianos"><span class="header-section-number">2.2</span> Modelos Bayesianos</a>
+  <ul class="collapse">
+  <li><a href="#formulación-general" id="toc-formulación-general" class="nav-link" data-scroll-target="#formulación-general"><span class="header-section-number">2.2.1</span> Formulación general</a></li>
+  <li><a href="#independencia-condicional-e-inferencia-de-la-red" id="toc-independencia-condicional-e-inferencia-de-la-red" class="nav-link" data-scroll-target="#independencia-condicional-e-inferencia-de-la-red"><span class="header-section-number">2.2.2</span> Independencia condicional e inferencia de la red</a></li>
+  <li><a href="#aprendizaje-de-las-redes-bayesianas" id="toc-aprendizaje-de-las-redes-bayesianas" class="nav-link" data-scroll-target="#aprendizaje-de-las-redes-bayesianas"><span class="header-section-number">2.2.3</span> Aprendizaje de las redes bayesianas</a></li>
+  <li><a href="#clasificadores" id="toc-clasificadores" class="nav-link" data-scroll-target="#clasificadores"><span class="header-section-number">2.2.4</span> Clasificadores</a></li>
+  </ul></li>
+  <li><a href="#modelos-ocultos-de-markov" id="toc-modelos-ocultos-de-markov" class="nav-link" data-scroll-target="#modelos-ocultos-de-markov"><span class="header-section-number">2.3</span> Modelos Ocultos de Markov</a>
+  <ul class="collapse">
+  <li><a href="#cadenas-de-markov" id="toc-cadenas-de-markov" class="nav-link" data-scroll-target="#cadenas-de-markov"><span class="header-section-number">2.3.1</span> Cadenas de Markov</a></li>
+  <li><a href="#cadena-de-markov-absorvente" id="toc-cadena-de-markov-absorvente" class="nav-link" data-scroll-target="#cadena-de-markov-absorvente"><span class="header-section-number">2.3.2</span> Cadena de Markov absorvente</a></li>
+  <li><a href="#modelos-ocultos-de-markov-1" id="toc-modelos-ocultos-de-markov-1" class="nav-link" data-scroll-target="#modelos-ocultos-de-markov-1"><span class="header-section-number">2.3.3</span> Modelos Ocultos de Markov</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Modelos Gráficos Probabilísticos y Análisis Causal</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="redes-bayesianas" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="redes-bayesianas"><span class="header-section-number">2.1</span> Redes Bayesianas</h2>
+<p>Al contrario de la Estadística tradicional, el aprendizaje bajo la Estadística Bayesiana tiene un enfoque probabilístico. Así, el razonamiento bayesiano supone que:</p>
+<ul>
+<li>Las hipótesis están gobernadas por una distribución de probabilidad</li>
+<li>Las decisiones son tomadas de forma “óptima” a partir de las observaciones y dichas probabilidades En este proceso de aprendizaje, las instancias de entrenamiento pueden modificar la probabilidad de una hipótesis, de forma que su planteamiento es mucho menos restrictivo que las técnicas tradicionales (cumplimiento de hipótesis más deterministas). Por tanto, el conocimiento a priori es combinado con las observaciones de los datos con el fin de mejorar el eficiencia de las estimaciones.</li>
+</ul>
+<p>Como veremos más adelante, los modelos bayesianos son muy utilizados en todo tipo de investigaciones debido a que proporcionan muy buenos resultados tanto para problemas descriptivos como predictivos:</p>
+<ul>
+<li>Método descriptivo: permite descubrir las relaciones de dependencia/independencia entre las diferentes variables</li>
+<li>Método predictivo: son utilizadas como métodos de clasificación. Entre las características de este tipo de técnicas se pueden citar:</li>
+<li>Permite realizar inferencias sobre los datos, lo que conlleva a inducir modelos probabilísticos</li>
+<li>Facilitar la interpretación de otros métodos en términos probabilísticos</li>
+<li>Se necesita conocer un elevado número de probabilidades</li>
+<li>Elevado coste computacional al realizar la actualización de las probabilidades</li>
+</ul>
+<p>Antes de entrar en detalle en la estructura de los métodos bayesianos definir algunos conceptos:</p>
+<ul>
+<li>Arco: es un par ordenado (X, Y). En la representación gráfica, un arco (X,Y) viene dado por una flecha desde X hasta Y.</li>
+<li>Grafo dirigido: es un par G = (N, A) donde N es un conjunto de nodos y A un conjunto de arcos definidos sobre los nodos.</li>
+<li>Grafo no dirigido. Es un par G = (N,A) donde N es un conjunto de nodos y A un conjunto de arcos no orientados (es decir, pares noordenados (X,Y)) definidos sobre los nodos. Ciclo: es un camino no dirigido que empieza y termina en el mismo nodo X.</li>
+<li>Grafo acíclico: es un grafo que no contiene ciclos.</li>
+<li>Padre. X es un padre de Y si y sólo si existe un arco X -&gt; Y. Se dice también que Y es hijo de X. Al conjunto de los padres de X se representa como pa(X), y al de los hijos de X por S(X).</li>
+<li>Antepasado o ascendiente. X es un antepasado o ascendiente de Z si y sólo si existe un camino dirigido de X a Z.</li>
+<li>Descendiente. Z es un descendiente de X si y sólo si X es un antepasado de Z. Al conjunto de los descendientes de X lo denotaremos por de(X). - Variable proposicional es una variable aleatoria que toma un conjunto exhaustivo y excluyente de valores. La denotaremos con letras mayúsculas, por ejemplo X, y a un valor cualquiera de la variable con la misma letra en minúscula, x.</li>
+<li>Dos variables X e Y son independientes si se tiene que P(X/Y) = P(X). De esta definición se tiene una caracterización de la independencia que se puede utilizar como definición alternativa: X e Y son independientes sí y sólo sí P(X,Y) = P(X)·P(Y).</li>
+<li>Dos variables X e Y son independientes dado una tercera variable Z si se tiene que P(X/Y,Z) = P(X/Y). De esta definición se tiene una caracterización de la independencia que se puede utilizar como definición alternativa: X e Y son independientes dado Z sí y sólo sí P(X,Y/Z) = P(X/Z)·P(Y/Z). También se dice que Z separa condicionalmente a X e Y.</li>
+</ul>
+<section id="modelo-naive-bayes-hipótesis-map-y-teorema-de-bayes" class="level3" data-number="2.1.1">
+<h3 data-number="2.1.1" class="anchored" data-anchor-id="modelo-naive-bayes-hipótesis-map-y-teorema-de-bayes"><span class="header-section-number">2.1.1</span> Modelo Naive Bayes: Hipótesis Map y Teorema de Bayes</h3>
+<p>La inferencia bayesiana es el eje central de los métodos bayesianos. Bajo ella, las hipótesis son expresadas a partir de distribuciones de probabilidad formuladas según los datos observados, <span class="math inline">\(p(\theta)\)</span>, donde <span class="math inline">\(\theta\)</span> son magnitudes desconocidas. La función verosimilitud, <span class="math inline">\(p(y/\theta)\)</span>, contiene la información disponible en los datos en relación a los parámetros y es ésta la que se usa para actualizar la distribución a priori, <span class="math inline">\(p(\theta)\)</span>). Finalmente, para llevar a cabo dicha actualización se emplea el Teorema de Bayes.</p>
+<p>Para entender el del <strong>Teorema de Bayes</strong> es necesario definir los siguientes conceptos:</p>
+<ul>
+<li>P(h) es la probabilidad a priori de la hipótesis h. Esta probabilidad contiene la información de que dicha hipótesis sea cierta</li>
+<li>P(D) es la probabilidad a priori de D. Esta es la probabilidad de observar los datos D (sin tener en cuenta la hipótesis que ha de ser cumplida)</li>
+<li>P(h/D) es la probabilidad a posteriori de D, es decir, es la probabilidad de que la hipótesis h una vez los datos D son observados.</li>
+<li>P(D/h) es la probabilidad a posteriori de D, es decir, es la probabilidad de que los datos D sean observados una vez la hipótesis h sea correcta.</li>
+</ul>
+<p>Sabiendo que la probabilidad conjunta de un evento dado el otro es proporcional a la probabilidad conjunta de ambos ponderada por la probabilidad del evento condicionante, se tiene:</p>
+<p><span class="math display">\[
+P(h \cap D) = P(h) \cdot P(D \mid h)
+\]</span></p>
+<p><span class="math display">\[
+P(h \cap D) = P(D) \cdot P(h \mid D)
+\]</span></p>
+<p>Igualando ambas ecuaciones y manipulando los términos se llega el Teorema de Bayes:</p>
+<p><span class="math display">\[
+P(h \mid D) = \frac{P(h) \cdot P(D \mid h)}{P(D)}
+\]</span></p>
+<p>De forma que la probabilidad a posteriori se puede determinar a partir de la probabilidad a priori y un factor de corrección.</p>
+<p>Para una mejora interpretación del Teorema de Bayes se muestra un ejemplo: &gt;<strong>En la sala de Pediatría de un determinado hospital el 60% de los pacientes son niñas. De los niños, se conoce que el 35% tienen menos de 24 meses, mientras que para las niñas el 20% son menores de 24 meses. Un médico selecciona una criatura al azar. Si la criatura tiene menos de 24, ¿cuál es la probabilidad de que sea niña? La tabla siguiente muestra la información que se deduce del enunciado:</strong></p>
+<blockquote class="blockquote">
+<p>La tabla siguiente muestra la información que se deduce del enunciado:</p>
+</blockquote>
+<table class="table">
+<thead>
+<tr class="header">
+<th>Probabilidad</th>
+<th>Valor</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>P(niño)</td>
+<td>0.40</td>
+</tr>
+<tr class="even">
+<td>P(niña)</td>
+<td>0.60</td>
+</tr>
+<tr class="odd">
+<td>P(&lt;24m / niño)</td>
+<td>0.35</td>
+</tr>
+<tr class="even">
+<td>P(&lt;24m / niña)</td>
+<td>0.20</td>
+</tr>
+</tbody>
+</table>
+<blockquote class="blockquote">
+<p>Se obtiene la probabilidad total de que la criatura tenga menos de 24 meses</p>
+</blockquote>
+<p><span class="math display">\[
+P(&lt;24m) = P(\text{niño}) \cdot P(&lt;24m \mid \text{niño}) + P(\text{niña}) \cdot P(&lt;24m \mid \text{niña}) = 0.4 \cdot 0.35 + 0.6 \cdot 0.2 = 0.26
+\]</span></p>
+<blockquote class="blockquote">
+<p>Aplicando el teorema de Bayes:</p>
+</blockquote>
+<p><span class="math display">\[
+P(\text{niña} \mid &lt;24m) = \frac{P(\text{niña}) \cdot P(&lt;24m \mid \text{niña})}{P(&lt;24m)} = \frac{0.6 \cdot 0.2}{0.26} = 0.46
+\]</span></p>
+<p>Por tanto, se tiene un 46% de posibilidades de que el médico haya seleccionado a una niña.</p>
+<p>A partir de la <em>probabilidad a posteriori</em> obtenida mediante la aplicación del Teorema de Bayes, se está en disposición de maximizar tal expresión; es decir, obtener la hipótesis más probable conocida como <strong>hipótesis MAP (o máximo a posteriori)</strong>:</p>
+<p><span class="math display">\[
+h_{MAP} = \arg\max_h P(h \mid D) = \arg\max_h [P(h) \cdot P(D \mid h)]
+\]</span></p>
+<p>Donde se ha tenido en cuenta que <em>P(D)</em> toma el mismo valor en todas las hipótesis.</p>
+<blockquote class="blockquote">
+<p><strong>Supongamos que estamos tratando de predecir si un estudiante aprueba un examen basándonos en dos características: horas de estudio y nivel de preparación. Nuestras hipótesis son</strong>:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li><span class="math inline">\(H_1\)</span><strong>: el estudiante aprueba el examen</strong></li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li><span class="math inline">\(H_2\)</span><strong>: el estudiante no aprueba el examen</strong></li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p><strong>Tenemos los siguientes datos:</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li><span class="math inline">\(H_1 = 0.7\)</span><strong>: probabilidad de que el estudiante apruebe el examen</strong></li>
+<li><span class="math inline">\(H_2 = 0.3\)</span><strong>: probabilidad de que el estudiante NO apruebe el examen</strong></li>
+<li><span class="math inline">\(P(E\mid H_1) = 0.8\)</span><strong>: probabilidad de que el estudiante estudie suficiente si aprueba</strong></li>
+<li><span class="math inline">\(P(E\mid H_2) = 0.8\)</span><strong>: probabilidad de que el estudiante estudie suficiente si NO aprueba</strong></li>
+</ul>
+</blockquote>
+<blockquote class="blockquote">
+<p><strong>Ahora supongamos que un estudiante estudia durante 4 horas y está muy bien preparado. Queremos calcular las probabilidades a posteriori de que el estudiante apruebe o no apruebe el examen, y determinar la hipótesis MAP.</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<ol type="1">
+<li>Calculamos la probabilidad marginal de observar las evidencias <span class="math inline">\(E\)</span>:</li>
+</ol>
+</blockquote>
+<p><span class="math display">\[
+P(E) = P(E \mid H_1) \times P(H_1) + P(E \mid H_2) \times P(H_2)
+\]</span></p>
+<p><span class="math display">\[
+P(E) = (0.8 \times 0.7) + (0.3 \times 0.3) = 0.56 + 0.09 = 0.65
+\]</span></p>
+<blockquote class="blockquote">
+<ol start="2" type="1">
+<li>Calculamos la probabilidad a posteriori de que el estudiante apruebe el examen (<span class="math inline">\(H_1\)</span>) dado que las evidencias <span class="math inline">\(E\)</span> se observan:</li>
+</ol>
+</blockquote>
+<p><span class="math display">\[
+P(H_1 \mid E) = \frac{P(E \mid H_1) \times P(H_1)}{P(E)}
+\]</span></p>
+<p><span class="math display">\[
+P(H_1 \mid E) = \frac{0.8 \times 0.7}{0.65} = \frac{0.56}{0.65} \approx 0.861
+\]</span></p>
+<blockquote class="blockquote">
+<ol start="3" type="1">
+<li>Calculamos la probabilidad a posteriori de que el estudiante no apruebe el examen (<span class="math inline">\(H_2\)</span>) dado que las evidencias <span class="math inline">\(E\)</span> se observan:</li>
+</ol>
+</blockquote>
+<p><span class="math display">\[
+P(H_2 \mid E) = \frac{P(E \mid H_2) \times P(H_2)}{P(E)}
+\]</span></p>
+<p><span class="math display">\[
+P(H_2 \mid E) = \frac{0.3 \times 0.3}{0.65} = \frac{0.09}{0.65} \approx 0.138
+\]</span></p>
+<blockquote class="blockquote">
+<p>Por tanto, la hipótesis más probable es que el estudiante apruebe el examen dado que ha estudiado durante 4 horas y está bien preparado.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Nota: Dado que <span class="math inline">\(P(E)\)</span> es constante para ambas hipótesis, se podría haber comparado directamente <span class="math inline">\(P(H_1 \mid E)\)</span> y <span class="math inline">\(P(H_2 \mid E)\)</span> para determinar la hipótesis MAP.</p>
+</blockquote>
+<p>El uso de la <em>hipótesis MAP</em> puede ser aplicado para resolver problemas de clasificación.</p>
+<p>Como sabemos, en dichas investigaciones se tiene una variable independiente conocida como clase o target y un conjunto de variables predictoras o atributos. Así, el Teorema de Bayes se puede reescribir como:</p>
+<p><span class="math display">\[
+P(C \mid (A_1, A_2, \ldots, A_N)) = \frac{P(C) \cdot P((A_1, A_2, \ldots, A_N) \mid C)}{P(A_1, A_2, \ldots, A_N)}
+\]</span></p>
+<p>Donde <em>C</em> denota el target o clase y <span class="math inline">\(A_i\)</span> el conjunto de variables explicativas.</p>
+<p>Haciendo máxima la probabilidad de <em>C</em> dado los atributos se tiene:</p>
+<p><span class="math display">\[
+c_{MAP} = \underset{c \in \Delta}{\arg\max} \ P(C \mid (A_1, A_2, \ldots, A_N)) = P(C) \cdot P((A_1, A_2, \ldots, A_N) \mid C)
+\]</span></p>
+<p>siendo <span class="math inline">\(\Delta\)</span> el conjunto de valores que puede tomar la variable objetivo (target del problema).</p>
+<p>Como puede verse, el enfoque planteado es bastante sencillo pero también muy costoso desde el punto de vista computacional ya que es necesario conocer las distribuciones de probabilidad de las variables implicadas en la investigación.</p>
+</section>
+<section id="modelo-naive-bayes" class="level3" data-number="2.1.2">
+<h3 data-number="2.1.2" class="anchored" data-anchor-id="modelo-naive-bayes"><span class="header-section-number">2.1.2</span> Modelo Naive-Bayes</h3>
+<p>El clasificador Naïve-Bayes es una versión simplificada del proceso de modelización anterior. Este método supone que todos los atributos son independientes conocido el valor de la variable clase de forma que la función de probabilidad conjunta queda como:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[P(C \mid (A_1, A_2, \ldots, A_N)) = P(C) \cdot \prod_{i=1}^{N} P(A_i \mid C)\]</span></p>
+<div>
+
+<p>Como es de esperar, el supuesto que subyace este clasificador no es muy realista; si bien, alcanza muy buenos resultados por lo que su uso está muy extendido en la comunidad de científico de datos.</p>
+<div id="fig-naivebayes" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-naivebayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/naive_bayes.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-naivebayes-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: Naive bayes
+</figcaption>
+</figure>
+</div>
+<p>Como en el caso anterior, se obtiene la hipótesis que maximiza la probabilidad del valor de la clase.</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[c_{MAP} = \underset{c \in \Delta}{\arg\max} \left( P(C) \cdot \prod_{i=1}^{N} P(A_i \mid C) \right)\]</span></p>
+<div>
+
+<p>El clasificador Naïve-Bayes puede emplearse tanto con variables explicativas discretas como numéricas.</p>
+<p>Cuando las variables explicativas son discretas, la probabilidad condicional es obtenida a partir de la frecuencia de los datos muestrales; de forma que ésta se define como el número de casos favorables entre el número de casos posibles. Matemáticamente, se tiene:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[P(x_i \mid \text{pa}(x_i)) = \frac{n(x_i, \text{pa}(x_i))}{n(\text{pa}(x_i))}\]</span></p>
+<div>
+
+<p>Donde <span class="math inline">\(n(x_i, Pa(x_i ))\)</span> denota el número de registros de la muestra en el que la variable <span class="math inline">\(X_i\)</span> toma el valor <span class="math inline">\(x_i\)</span> y <span class="math inline">\(pa(x_i )\)</span> los padres de <span class="math inline">\(X_i\)</span>. Notar que el padre de cada variable explicativa es la variable independiente, la cual se ha denominado target o clase.</p>
+<p>En el caso en que el tamaño de la muestra de trabajo sea pequeño, el uso de las frecuencias puede ocasionar estimaciones poco fiables por lo que se emplean estimadores basados en suavizados. Uno de los más empleados es el estimador de Laplace en el que la probabilidad viene expresada por el número de casos favorables + 1 dividida por el de casos totales más el número de alternativas.</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[P(x_i \mid \text{Pa}(x_i)) = \frac{n(x_i, \text{pa}(x_i)) + 1}{n(\text{pa}(x_i)) + \alpha}\]</span></p>
+<div>
+
+<p>Por su parte, si se dispone de variables numéricas el estimador Naïve-Bayes supone que dichas variables siguen una distribución normal donde la media y la desviación típica son estimadas a partir de los datos de la muestra. Sin embargo, en la mayor parte de las ocasionales, las variables continuas no suelen seguir una distribución de probabilidad normal es posible que las estimaciones sean poco eficientes por lo que se recomienda transformar dichas variables en cualitativas (por ejemplo: empleando los intervalos que se obtienen al tomar los cuantiles de su distribución).</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1"></a><span class="im">import</span> os</span>
+<span id="cb1-2"><a href="#cb1-2"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb1-3"><a href="#cb1-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-4"><a href="#cb1-4"></a></span>
+<span id="cb1-5"><a href="#cb1-5"></a>datos <span class="op">=</span> pd.read_csv(<span class="st">"../datos/credit_g.csv"</span>)</span>
+<span id="cb1-6"><a href="#cb1-6"></a></span>
+<span id="cb1-7"><a href="#cb1-7"></a>datos.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1"></a><span class="co"># Pasamos las variables a categóricas</span></span>
+<span id="cb2-2"><a href="#cb2-2"></a>datos[<span class="st">'checking_status'</span>] <span class="op">=</span> datos[<span class="st">'checking_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-3"><a href="#cb2-3"></a>datos[<span class="st">'credit_history'</span>] <span class="op">=</span> datos[<span class="st">'credit_history'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-4"><a href="#cb2-4"></a>datos[<span class="st">'purpose'</span>] <span class="op">=</span> datos[<span class="st">'purpose'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a>datos[<span class="st">'savings_status'</span>] <span class="op">=</span> datos[<span class="st">'savings_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a>datos[<span class="st">'employment'</span>] <span class="op">=</span> datos[<span class="st">'employment'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-7"><a href="#cb2-7"></a>datos[<span class="st">'personal_status'</span>] <span class="op">=</span> datos[<span class="st">'personal_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-8"><a href="#cb2-8"></a>datos[<span class="st">'other_parties'</span>] <span class="op">=</span> datos[<span class="st">'other_parties'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-9"><a href="#cb2-9"></a>datos[<span class="st">'property_magnitude'</span>] <span class="op">=</span> datos[<span class="st">'property_magnitude'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-10"><a href="#cb2-10"></a>datos[<span class="st">'other_payment_plans'</span>] <span class="op">=</span> datos[<span class="st">'other_payment_plans'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>datos[<span class="st">'housing'</span>] <span class="op">=</span> datos[<span class="st">'housing'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>datos[<span class="st">'job'</span>] <span class="op">=</span> datos[<span class="st">'job'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-13"><a href="#cb2-13"></a>datos[<span class="st">'property_magnitude'</span>] <span class="op">=</span> datos[<span class="st">'property_magnitude'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>datos[<span class="st">'own_telephone'</span>] <span class="op">=</span> datos[<span class="st">'own_telephone'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-15"><a href="#cb2-15"></a>datos[<span class="st">'foreign_worker'</span>] <span class="op">=</span> datos[<span class="st">'foreign_worker'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb2-16"><a href="#cb2-16"></a>datos[<span class="st">'class'</span>] <span class="op">=</span> datos[<span class="st">'class'</span>].astype(<span class="st">'category'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1"></a><span class="co"># La variable class es una variable reservada en diferentes módulos de Python -&gt; reemplazar por por target</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>datos.rename(columns<span class="op">=</span>{<span class="st">'class'</span>: <span class="st">'target'</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb3-3"><a href="#cb3-3"></a>datos[<span class="st">'target'</span>]<span class="op">=</span>np.where(datos[<span class="st">'target'</span>]<span class="op">==</span><span class="st">'good'</span>, <span class="dv">0</span>, <span class="dv">1</span>) <span class="co"># cambio en la codificación por sencillez en el preprocesado</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1"></a><span class="co"># Definición de la muestra de trabajo</span></span>
+<span id="cb4-2"><a href="#cb4-2"></a>datos_entrada <span class="op">=</span> datos.drop(<span class="st">'target'</span>, axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># Datos de entrada</span></span>
+<span id="cb4-3"><a href="#cb4-3"></a>datos_entrada <span class="op">=</span> pd.get_dummies(datos_entrada, drop_first<span class="op">=</span><span class="va">True</span>, dtype<span class="op">=</span><span class="bu">int</span>) <span class="co">#conversión a variables dummy</span></span>
+<span id="cb4-4"><a href="#cb4-4"></a></span>
+<span id="cb4-5"><a href="#cb4-5"></a>target <span class="op">=</span> datos[<span class="st">"target"</span>] <span class="co"># muestra del target</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split, RepeatedStratifiedKFold, GridSearchCV</span>
+<span id="cb5-3"><a href="#cb5-3"></a></span>
+<span id="cb5-4"><a href="#cb5-4"></a><span class="co"># Partición de la muestra</span></span>
+<span id="cb5-5"><a href="#cb5-5"></a></span>
+<span id="cb5-6"><a href="#cb5-6"></a>test_size <span class="op">=</span> <span class="fl">0.3</span> <span class="co"># muestra para el test </span></span>
+<span id="cb5-7"><a href="#cb5-7"></a>seed <span class="op">=</span> <span class="dv">222</span> <span class="co"># semilla</span></span>
+<span id="cb5-8"><a href="#cb5-8"></a></span>
+<span id="cb5-9"><a href="#cb5-9"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb5-10"><a href="#cb5-10"></a>    datos_entrada, target, test_size<span class="op">=</span>test_size, random_state<span class="op">=</span>seed, stratify<span class="op">=</span>target</span>
+<span id="cb5-11"><a href="#cb5-11"></a>)</span>
+<span id="cb5-12"><a href="#cb5-12"></a></span>
+<span id="cb5-13"><a href="#cb5-13"></a><span class="co"># Estandarización de la muestra</span></span>
+<span id="cb5-14"><a href="#cb5-14"></a>esc <span class="op">=</span> StandardScaler().fit(X_train) <span class="co"># valores media y std de los datos de train</span></span>
+<span id="cb5-15"><a href="#cb5-15"></a></span>
+<span id="cb5-16"><a href="#cb5-16"></a><span class="co"># aplicación a los datos de train y test</span></span>
+<span id="cb5-17"><a href="#cb5-17"></a>X_train_esc <span class="op">=</span> esc.transform(X_train)</span>
+<span id="cb5-18"><a href="#cb5-18"></a>X_test_esc <span class="op">=</span> esc.transform(X_test)</span>
+<span id="cb5-19"><a href="#cb5-19"></a></span>
+<span id="cb5-20"><a href="#cb5-20"></a><span class="co"># Validación cruczada</span></span>
+<span id="cb5-21"><a href="#cb5-21"></a>cv <span class="op">=</span> RepeatedStratifiedKFold(n_splits<span class="op">=</span><span class="dv">10</span>, n_repeats<span class="op">=</span><span class="dv">2</span>, random_state<span class="op">=</span>seed)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="bernoulli-naive-bayes" class="level4" data-number="2.1.2.1">
+<h4 data-number="2.1.2.1" class="anchored" data-anchor-id="bernoulli-naive-bayes"><span class="header-section-number">2.1.2.1</span> Bernoulli Naive Bayes</h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> BernoulliNB </span>
+<span id="cb6-2"><a href="#cb6-2"></a>bernoulli_nb<span class="op">=</span>BernoulliNB(force_alpha<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb6-3"><a href="#cb6-3"></a></span>
+<span id="cb6-4"><a href="#cb6-4"></a>grid<span class="op">=</span>[{<span class="st">'alpha'</span>: <span class="bu">list</span>(np.arange(<span class="fl">0.05</span>, <span class="dv">1</span>, <span class="fl">0.1</span>)), <span class="st">'binarize'</span>: [<span class="fl">0.3</span>, <span class="fl">0.1</span>, <span class="fl">0.0</span>]}]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1"></a><span class="co"># Definición del modelo con hiperparámetros</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>gs_bernoulli_nb <span class="op">=</span> GridSearchCV(</span>
+<span id="cb7-3"><a href="#cb7-3"></a>    estimator<span class="op">=</span>bernoulli_nb, param_grid<span class="op">=</span>grid, scoring<span class="op">=</span><span class="st">'accuracy'</span>, cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">1</span>, return_train_score<span class="op">=</span><span class="va">False</span></span>
+<span id="cb7-4"><a href="#cb7-4"></a>)</span>
+<span id="cb7-5"><a href="#cb7-5"></a>gs_bernoulli_nb <span class="op">=</span> gs_bernoulli_nb.fit(X_train, y_train)</span>
+<span id="cb7-6"><a href="#cb7-6"></a></span>
+<span id="cb7-7"><a href="#cb7-7"></a><span class="bu">print</span>(<span class="ss">f'Naive-Bayes (Bernoulli) (parámetros): </span><span class="sc">{</span>gs_bernoulli_nb<span class="sc">.</span>best_params_<span class="sc">}</span><span class="ss">'</span>) <span class="co"># parámetros del modelo final</span></span>
+<span id="cb7-8"><a href="#cb7-8"></a></span>
+<span id="cb7-9"><a href="#cb7-9"></a>bernoulli_nb <span class="op">=</span> gs_bernoulli_nb.best_estimator_ <span class="co"># modelo final</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1"></a><span class="co"># Resultados importantes de estos algoritmos (acceso dentro del objeto del modelo)</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a><span class="bu">print</span>(bernoulli_nb.class_log_prior_)  <span class="co"># logaritmo de la probabilidad de cada clase</span></span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="bu">print</span>(bernoulli_nb.class_log_prior_)  <span class="co"># logaritmo de la probabilidad de cada clase</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>bernoulli_nb.feature_log_prob_ <span class="co"># logaritmo de la probabilidad de la variable dada la clase (P(Xi|Y)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1"></a><span class="im">import</span> seaborn <span class="im">as</span> sns</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb9-3"><a href="#cb9-3"></a></span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score, roc_curve, auc, confusion_matrix</span>
+<span id="cb9-5"><a href="#cb9-5"></a></span>
+<span id="cb9-6"><a href="#cb9-6"></a><span class="im">import</span> warnings</span>
+<span id="cb9-7"><a href="#cb9-7"></a><span class="co"># Suprimir todas las advertencias</span></span>
+<span id="cb9-8"><a href="#cb9-8"></a>warnings.simplefilter(<span class="st">"ignore"</span>)</span>
+<span id="cb9-9"><a href="#cb9-9"></a></span>
+<span id="cb9-10"><a href="#cb9-10"></a></span>
+<span id="cb9-11"><a href="#cb9-11"></a><span class="co"># Predicciones muestra entrenamiento y test</span></span>
+<span id="cb9-12"><a href="#cb9-12"></a></span>
+<span id="cb9-13"><a href="#cb9-13"></a>preds_train <span class="op">=</span> bernoulli_nb.predict(X_train)</span>
+<span id="cb9-14"><a href="#cb9-14"></a>preds_test <span class="op">=</span> bernoulli_nb.predict(X_test)</span>
+<span id="cb9-15"><a href="#cb9-15"></a></span>
+<span id="cb9-16"><a href="#cb9-16"></a><span class="co"># Cálculo métricas bondad de ajuste </span></span>
+<span id="cb9-17"><a href="#cb9-17"></a><span class="bu">print</span>(<span class="st">'Accuracy'</span>)</span>
+<span id="cb9-18"><a href="#cb9-18"></a><span class="bu">print</span>(<span class="st">'------------------------------'</span>)</span>
+<span id="cb9-19"><a href="#cb9-19"></a><span class="bu">print</span>(<span class="ss">f'Entrenamiento (cv): </span><span class="sc">{</span><span class="bu">round</span>(gs_bernoulli_nb.best_score_,<span class="dv">5</span>)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb9-20"><a href="#cb9-20"></a>accuracy_test <span class="op">=</span> accuracy_score(y_test, preds_test)</span>
+<span id="cb9-21"><a href="#cb9-21"></a><span class="bu">print</span>(<span class="ss">f'Test: </span><span class="sc">{</span><span class="bu">round</span>(accuracy_test,<span class="dv">5</span>)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb9-22"><a href="#cb9-22"></a></span>
+<span id="cb9-23"><a href="#cb9-23"></a><span class="co"># AUC - test y curva roc (final</span></span>
+<span id="cb9-24"><a href="#cb9-24"></a>y_pred_test <span class="op">=</span> bernoulli_nb.predict_proba(X_test)</span>
+<span id="cb9-25"><a href="#cb9-25"></a>fp_rate_test, tp_rate_test, thresholds <span class="op">=</span> roc_curve(y_test, y_pred_test[:,<span class="dv">1</span>])</span>
+<span id="cb9-26"><a href="#cb9-26"></a>auc_test <span class="op">=</span> auc(fp_rate_test, tp_rate_test)</span>
+<span id="cb9-27"><a href="#cb9-27"></a></span>
+<span id="cb9-28"><a href="#cb9-28"></a><span class="co"># Bondad de ajuste: matriz de confusión y curva roc para los datos de test</span></span>
+<span id="cb9-29"><a href="#cb9-29"></a></span>
+<span id="cb9-30"><a href="#cb9-30"></a>f, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>))</span>
+<span id="cb9-31"><a href="#cb9-31"></a></span>
+<span id="cb9-32"><a href="#cb9-32"></a>sns.heatmap(confusion_matrix(preds_test, y_test), annot <span class="op">=</span> <span class="va">True</span>, cmap <span class="op">=</span> plt.cm.Reds, fmt<span class="op">=</span><span class="st">'.0f'</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>]) <span class="co"># matriz de confusión</span></span>
+<span id="cb9-33"><a href="#cb9-33"></a>sns.lineplot(x<span class="op">=</span>fp_rate_test, y<span class="op">=</span>tp_rate_test, color<span class="op">=</span><span class="st">'skyblue'</span>, label<span class="op">=</span><span class="st">'AUC = </span><span class="sc">%0.2f</span><span class="st">'</span> <span class="op">%</span> auc_test, ax<span class="op">=</span>axes[<span class="dv">1</span>]) <span class="co"># curva roc</span></span>
+<span id="cb9-34"><a href="#cb9-34"></a></span>
+<span id="cb9-35"><a href="#cb9-35"></a>plt.legend(loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb9-36"><a href="#cb9-36"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="gaussian-naive-bayes" class="level4" data-number="2.1.2.2">
+<h4 data-number="2.1.2.2" class="anchored" data-anchor-id="gaussian-naive-bayes"><span class="header-section-number">2.1.2.2</span> Gaussian Naive Bayes</h4>
+<div class="sourceCode" id="cb10"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1"></a><span class="im">from</span> sklearn.naive_bayes <span class="im">import</span> GaussianNB  </span>
+<span id="cb10-2"><a href="#cb10-2"></a></span>
+<span id="cb10-3"><a href="#cb10-3"></a>gaussian_nb <span class="op">=</span> GaussianNB()</span>
+<span id="cb10-4"><a href="#cb10-4"></a>grid<span class="op">=</span>[{<span class="st">'var_smoothing'</span>: <span class="bu">list</span>(np.arange(<span class="dv">0</span>,<span class="fl">0.1</span>, <span class="fl">0.02</span>))}]</span>
+<span id="cb10-5"><a href="#cb10-5"></a></span>
+<span id="cb10-6"><a href="#cb10-6"></a><span class="co"># Definición del modelo con hiperparámetros</span></span>
+<span id="cb10-7"><a href="#cb10-7"></a>gs_gaussian_nb<span class="op">=</span>GridSearchCV(</span>
+<span id="cb10-8"><a href="#cb10-8"></a>    estimator<span class="op">=</span>gaussian_nb, param_grid<span class="op">=</span>grid, scoring<span class="op">=</span><span class="st">'accuracy'</span>, cv<span class="op">=</span>cv, n_jobs<span class="op">=</span><span class="dv">1</span>, return_train_score<span class="op">=</span><span class="va">False</span></span>
+<span id="cb10-9"><a href="#cb10-9"></a>)</span>
+<span id="cb10-10"><a href="#cb10-10"></a></span>
+<span id="cb10-11"><a href="#cb10-11"></a>gs_gaussian_nb <span class="op">=</span> gs_gaussian_nb.fit(X_train, y_train)</span>
+<span id="cb10-12"><a href="#cb10-12"></a><span class="bu">print</span>(<span class="st">'Naive-Bayes (Bernoulli) (parámetros):'</span>, gs_gaussian_nb.best_params_) </span>
+<span id="cb10-13"><a href="#cb10-13"></a></span>
+<span id="cb10-14"><a href="#cb10-14"></a><span class="co">#parámetros del modelo final</span></span>
+<span id="cb10-15"><a href="#cb10-15"></a>gaussian_nb <span class="op">=</span> gs_gaussian_nb.best_estimator_ <span class="co">#modelo final</span></span>
+<span id="cb10-16"><a href="#cb10-16"></a></span>
+<span id="cb10-17"><a href="#cb10-17"></a><span class="co"># predicciones muestra entrenamiento y test</span></span>
+<span id="cb10-18"><a href="#cb10-18"></a></span>
+<span id="cb10-19"><a href="#cb10-19"></a>preds_train <span class="op">=</span> gaussian_nb.predict(X_train)</span>
+<span id="cb10-20"><a href="#cb10-20"></a>preds_test <span class="op">=</span> gaussian_nb.predict(X_test)</span>
+<span id="cb10-21"><a href="#cb10-21"></a></span>
+<span id="cb10-22"><a href="#cb10-22"></a><span class="co"># Cálculo métricas bondad de ajuste </span></span>
+<span id="cb10-23"><a href="#cb10-23"></a></span>
+<span id="cb10-24"><a href="#cb10-24"></a><span class="bu">print</span>(<span class="st">'Accuracy'</span>)</span>
+<span id="cb10-25"><a href="#cb10-25"></a><span class="bu">print</span>(<span class="st">'------------------------------'</span>)</span>
+<span id="cb10-26"><a href="#cb10-26"></a><span class="bu">print</span>(<span class="ss">f'Entrenamiento (cv):, </span><span class="sc">{</span><span class="bu">round</span>(gs_gaussian_nb.best_score_,<span class="dv">5</span>)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb10-27"><a href="#cb10-27"></a>accuracy_test <span class="op">=</span> accuracy_score(y_test, preds_test)</span>
+<span id="cb10-28"><a href="#cb10-28"></a><span class="bu">print</span>(<span class="st">'Test:'</span>, <span class="bu">round</span>(accuracy_test,<span class="dv">5</span>))</span>
+<span id="cb10-29"><a href="#cb10-29"></a></span>
+<span id="cb10-30"><a href="#cb10-30"></a><span class="co">#AUC - test y curva roc (final)</span></span>
+<span id="cb10-31"><a href="#cb10-31"></a></span>
+<span id="cb10-32"><a href="#cb10-32"></a>y_pred_test <span class="op">=</span> gaussian_nb.predict_proba(X_test)</span>
+<span id="cb10-33"><a href="#cb10-33"></a>fp_rate_test, tp_rate_test, thresholds <span class="op">=</span> roc_curve(y_test, y_pred_test[:,<span class="dv">1</span>])</span>
+<span id="cb10-34"><a href="#cb10-34"></a>auc_test <span class="op">=</span> auc(fp_rate_test, tp_rate_test)</span>
+<span id="cb10-35"><a href="#cb10-35"></a></span>
+<span id="cb10-36"><a href="#cb10-36"></a><span class="co"># Bondad de ajuste: matriz de confusión y curva roc para los datos de test</span></span>
+<span id="cb10-37"><a href="#cb10-37"></a></span>
+<span id="cb10-38"><a href="#cb10-38"></a>f, axes <span class="op">=</span> plt.subplots(<span class="dv">1</span>, <span class="dv">2</span>, figsize<span class="op">=</span>(<span class="dv">10</span>,<span class="dv">5</span>))</span>
+<span id="cb10-39"><a href="#cb10-39"></a></span>
+<span id="cb10-40"><a href="#cb10-40"></a>sns.heatmap(confusion_matrix(preds_test, y_test), annot <span class="op">=</span> <span class="va">True</span>, cmap <span class="op">=</span> plt.cm.Reds, fmt<span class="op">=</span><span class="st">'.0f'</span>, ax<span class="op">=</span>axes[<span class="dv">0</span>]) <span class="co"># matriz de confusión</span></span>
+<span id="cb10-41"><a href="#cb10-41"></a>sns.lineplot(x<span class="op">=</span>fp_rate_test, y<span class="op">=</span>tp_rate_test, color<span class="op">=</span><span class="st">'skyblue'</span>, label<span class="op">=</span><span class="st">'AUC = </span><span class="sc">%0.2f</span><span class="st">'</span> <span class="op">%</span> auc_test, ax<span class="op">=</span>axes[<span class="dv">1</span>]) <span class="co"># curva roc</span></span>
+<span id="cb10-42"><a href="#cb10-42"></a></span>
+<span id="cb10-43"><a href="#cb10-43"></a>plt.legend(loc<span class="op">=</span><span class="st">"lower right"</span>)</span>
+<span id="cb10-44"><a href="#cb10-44"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</div></div></div></div></div></div></div></div></section>
+</section>
+<section id="modelos-bayesianos" class="level2" data-number="2.2">
+<h2 data-number="2.2" class="anchored" data-anchor-id="modelos-bayesianos"><span class="header-section-number">2.2</span> Modelos Bayesianos</h2>
+<p>Las redes bayesianas son métodos estadísticos que representan la incertidumbre a través de las relaciones de independencia condicional que se establecen entre ellas. Por tanto, permiten modelar un fenómeno a partir de dichas relaciones y hacer inferencia.</p>
+<p>Este tipo de métodos son una representación gráfica de dependencias para razonamiento probabilístico, en las que los nodos representan variables aleatorias y los arcos las relaciones de dependencia directa entre las variables.</p>
+<div id="fig-topologia_bayesinas" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-topologia_bayesinas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/topologia_bayesiana.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-topologia_bayesinas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: Topologia Bayesiana
+</figcaption>
+</figure>
+</div>
+<p>La ventaja de las redes bayesianas frente a otros métodos es la posibilidad de codificar las dependencias/independencias relevantes considerando no sólo las dependencias marginales sino también las dependencias condicionales entre un conjunto de variables.</p>
+<p>En definitiva, las redes bayesianas modelan las relaciones entre las variables tanto de forma cualitativa como cuantitativa. La fuerza de dichas relaciones viene dada en las distribuciones de probabilidad como una medida de la creencia que tenemos sobre esas relaciones en el modelo.</p>
+<section id="formulación-general" class="level3" data-number="2.2.1">
+<h3 data-number="2.2.1" class="anchored" data-anchor-id="formulación-general"><span class="header-section-number">2.2.1</span> Formulación general</h3>
+<p>Una red bayesiana queda especificada formalmente por una dupla B=(G,Θ) donde G es un grafo dirigido acíclico (DAG, por las siglas en inglés) y Θ es el conjunto de distribuciones de probabilidad. Definimos un grafo como un par G = (V, E), donde V es un conjunto finito de vértices, nodos o variables, y E es un subconjunto del producto cartesiano VxV de pares ordenados de nodos que llamamos enlaces o aristas. Por tanto, puede decirse que las redes bayesianas representan el conocimiento cualitativo del modelo mediante el grafo dirigido acíclico.</p>
+<blockquote class="blockquote">
+<p>Supongamos una red bayesiana que contine un padre <em>A</em> y 3 hijos (<em>B</em>, <em>C</em> y <em>D</em>), siendo <em>C</em> también padre de <em>B</em>. El DAG que definido sería:</p>
+</blockquote>
+<div class="sourceCode" id="cb11"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1"></a><span class="im">import</span> bnlearn <span class="im">as</span> bn</span>
+<span id="cb11-2"><a href="#cb11-2"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb11-3"><a href="#cb11-3"></a></span>
+<span id="cb11-4"><a href="#cb11-4"></a>edges <span class="op">=</span> [(<span class="st">'A'</span>, <span class="st">'B'</span>), (<span class="st">'A'</span>, <span class="st">'C'</span>), (<span class="st">'A'</span>, <span class="st">'D'</span>), (<span class="st">'C'</span>, <span class="st">'B'</span>)]</span>
+<span id="cb11-5"><a href="#cb11-5"></a>DAG <span class="op">=</span> bn.make_DAG(edges, methodtype<span class="op">=</span><span class="st">"bayes"</span>)</span>
+<span id="cb11-6"><a href="#cb11-6"></a></span>
+<span id="cb11-7"><a href="#cb11-7"></a>bn.plot(DAG, interactive<span class="op">=</span><span class="va">False</span>)</span>
+<span id="cb11-8"><a href="#cb11-8"></a>plt.show()</span>
+<span id="cb11-9"><a href="#cb11-9"></a></span>
+<span id="cb11-10"><a href="#cb11-10"></a><span class="co"># print(DAG["adjmat"])  # podemos ver el dag en formato tabla (no visual cuando existen muchos nodos)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>El grafo define un modelo probabilístico mediante el producto de varias funciones de probabilidad condicionada:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[P(x_1, \ldots, x_n) = \prod_{i=1}^{N} P(x_i \mid \text{pa}(x_i))\]</span></p>
+<div>
+
+<p>Con <span class="math inline">\(pa(x_i)\)</span> las variables inmediatamente predecesoras de la variable <span class="math inline">\(X_i\)</span>. En este sentido, los valores de probabilidades <span class="math inline">\(P(x_i⁄pa(x_i ))\)</span> son “almacenados” en el nodo que precede a la variable <span class="math inline">\(X_i\)</span>.</p>
+<p>Es importante resaltar que de no existir la expresión anterior, la red debiese ser descrita a partir de la probabilidad conjunta, lo que obligaría a trabajar con un número de parámetros mucho más elevado (creciente de forma exponencial en el número de nodos).</p>
+</div></div></section>
+<section id="independencia-condicional-e-inferencia-de-la-red" class="level3" data-number="2.2.2">
+<h3 data-number="2.2.2" class="anchored" data-anchor-id="independencia-condicional-e-inferencia-de-la-red"><span class="header-section-number">2.2.2</span> Independencia condicional e inferencia de la red</h3>
+<p>Como se ha comentado anteriormente, una variable X es condicionalmente independiente de otra variable Y dada una tercera Z si, el hecho de que se tenga conocimiento Z, hace que Y no tenga influencia en X.</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[P(X|Y,Z)=P(X|Z)\]</span></p>
+<div>
+
+<p>Por tanto, la hipótesis de <strong>independencia condicional</strong> establece que cada nodo debe ser independiente de los otros nodos de la red (salvo sus descendientes) dados sus padres. Dicho de otro modo, si se conocen los padres de una variable, ésta se vuelve independiente del resto de sus predecesores.</p>
+<blockquote class="blockquote">
+<p>Veamos un ejemplo para facilitar la comprensión de la independencia condicional.</p>
+</blockquote>
+<div id="fig-ejemplo_redes_bayesianas" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-ejemplo_redes_bayesianas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/ejemplo_redes_bayesianas.png" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-ejemplo_redes_bayesianas-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Topologia Bayesiana
+</figcaption>
+</figure>
+</div>
+<blockquote class="blockquote">
+<p>Partiendo de la red bayesiana de la imagen anterior, la probabilidad conjunta se define como:</p>
+</blockquote>
+<span class="math display">\[\begin{align}
+P(X_1, X_2, \ldots, X_9) &amp;= P(X_1) \cdot P(X_2) \cdot P(X_3 \mid X_2, X_1) \cdot P(X_4 \mid X_3, X_2, X_1) \\
+&amp;\quad \cdot P(X_5 \mid X_4, X_3, X_2, X_1) \cdot P(X_6 \mid X_5, X_4, X_3, X_2, X_1) \\
+&amp;\quad \cdot P(X_7 \mid X_6, X_5, X_4, X_3, X_2, X_1) \\
+&amp;\quad \cdot P(X_8 \mid X_7, X_6, X_5, X_4, X_3, X_2, X_1) \\
+&amp;\quad \cdot P(X_9 \mid X_8, X_7, X_6, X_5, X_4, X_3, X_2, X_1)
+\end{align}\]</span>
+<blockquote class="blockquote">
+<p>En cambio, como las probabilidades condicionales solo dependen de sus padres (teorema anterior), la probabilidad conjunta toma la siguiente forma:</p>
+</blockquote>
+<span class="math display">\[\begin{align}
+P(X_1, X_2, \ldots, X_9) &amp;= P(X_1) \cdot P(X_2) \cdot P(X_3 \mid X_2) \cdot P(X_4 \mid X_2, X_1) \\
+&amp;\quad \cdot P(X_5 \mid X_4) \cdot P(X_6 \mid X_4) \cdot P(X_7 \mid X_4) \\
+&amp;\quad \cdot P(X_8 \mid X_3) \cdot P(X_9 \mid X_3)
+\end{align}\]</span>
+<p>Por tanto, *la propiedad de independencia de las redes bayesianas hace que se reduzca en gran medida los cálculos**.</p>
+<p>En una red bayesiana, se conoce como <strong>inferencia probabilística</strong> a la propagación del conocimiento a través de la misma una vez se tienen nuevos datos. Este proceso se lleva a cabo actualizando las probabilidades a posteriori en toda la estructura de la red mediante el Teorema de Bayes.</p>
+<p>Como es de imaginar, el proceso de inferencia es muy costoso computacionalmente de forma que, dependiendo de las necesidades, se emplean algoritmos exactos o aproximados:</p>
+<ul>
+<li>Exactos: cuando puede calcularse la inferencia de forma exacta. El coste computacional necesario para la actualización de las probabilidades es viable</li>
+<li>Aproximados: se usan técnicas de muestreo que permita calcular de forma aproximada la inferencia. Usado cuando no es viable obtener la propagación exacta en un tiempo razonable</li>
+</ul>
+</div></div></section>
+<section id="aprendizaje-de-las-redes-bayesianas" class="level3" data-number="2.2.3">
+<h3 data-number="2.2.3" class="anchored" data-anchor-id="aprendizaje-de-las-redes-bayesianas"><span class="header-section-number">2.2.3</span> Aprendizaje de las redes bayesianas</h3>
+<p>Como se ha visto, para determinar una red bayesiana es necesario especificar su estructura gráfica y una función de probabilidad conjunta. Dicho proceso es bastante laborioso debido a que, en muchos casos, se desconoce ambas especificaciones. Para paliar esta circunstancia, se han desarrollado diferentes métodos de aprendizaje. Así, el proceso de aprendizaje de una red bayesiana puede dividirse en dos estapas:</p>
+<ul>
+<li>Estructural (o dimensión cualitativa): búsqueda en el espacio de posibles redes</li>
+<li>Paramétrico (o dimensión cuantitativa): aprende la distribución de probabilidad a partir de los datos, dada la red</li>
+</ul>
+<p>El <em>aprendizaje paramétrico</em> consiste en hallar los parámetros asociados a la estructura de la red. Estos parámetros están constituidos por las probabilidades de los nodos raíz y las probabilidades condicionales de las demás variables dados sus padres. Las probabilidades previas se corresponden con las marginales de los nodos raíz y las condicionales se obtienen de las distribuciones de cada nodo con sus padres.</p>
+<p>En el <em>aprendizaje estructural</em> es donde se establecen las relaciones de dependencia que existen entre las variables del conjunto de datos para obtener el mejor grafo que represente estas relaciones. Este problema se hace prácticamente intratable desde el punto de vista computacional cuando el número de variables es grande. Por ello, suelen emplearse algoritmos de búsqueda para aprender la estructura de la red.</p>
+<p>A continuación, se presentan algunos algoritmos de búsqueda para establecer la estructura de una red bayesiana.</p>
+<p><strong>Algoritmo K2</strong></p>
+<p>El algoritmo K2 es considerado el predecesor de otros algoritmos de búsqueda más sofisticados. basado en búsqueda y optimización de una métrica bayesiana es considerado como el predecesor y fuente de inspiración para las generaciones posteriores. El proceso de búsqueda de este algoritmo está dividido en las siguientes etapas: - Ordenación de los nodos (variables de entrada) de forma que los posibles padres de una variable aparezcan siempre antes de ella para evitar la generación de ciclos. Esta restricción provoca que el algoritmo busque los padres posibles entre las variables predecesoras (ventaja computacional) - Partiendo de este orden establecido, se calcula la ganancia que se produce en la medida al introducir una variable como padre</p>
+<p>Finalmente, el proceso se repite para cada nodo mientras el incremento de calidad supere un cierto umbral preestablecido.</p>
+<p><strong>Algoritmo B</strong></p>
+<p>Este algoritmo elimina la dependencia de la ordenación previa de los nodos de forma que su coste de computación es superior al algoritmo K2. complejidad computacional es mayor. Como en el caso anterior, el proceso es iniciado con padres vacíos con padres vacíos y en cada etapa se añade aquel enlace que maximice el incremento de calidad eliminando aquellos que producen ciclos. El proceso es detenido cuando una vez la inclusión de un arco no represente ninguna ganancia.</p>
+<p><strong>Algoritmo Hill Climbing</strong></p>
+<p>El algoritmo Hill Climbing (HC) es un procedimiento de búsqueda que parte de una solución inicial y, a partir de ésta, mediante técnicas heurística se calcula el nuevo valor utilizando todas las soluciones vecinas a la solución actual, seleccionando el vecino que mejor solución presenta. Por tanto, este algoritmo finaliza cuando no existe ningún vecino que pueda mejorar la solución vecina.</p>
+<p>Una variante muy útil y muy empleada consiste en considerar todos los posibles movimientos a partir del estado actual y elegir el mejor de ellos como nuevo estado. A este método se le denomina ascensión por la máxima pendiente o búsqueda del gradiente.</p>
+<blockquote class="blockquote">
+<p>Vamos a mostrar un ejemplo de <strong>aprendizaje de la estructura</strong> en python:</p>
+</blockquote>
+<div class="sourceCode" id="cb12"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb12-2"><a href="#cb12-2"></a></span>
+<span id="cb12-3"><a href="#cb12-3"></a>datos <span class="op">=</span> pd.read_csv(<span class="st">"../datos/bayesian_data.csv"</span>, sep<span class="op">=</span><span class="st">";"</span>, index_col<span class="op">=</span><span class="st">"Unnamed: 0"</span>)</span>
+<span id="cb12-4"><a href="#cb12-4"></a>datos <span class="op">=</span> datos.rename(columns<span class="op">=</span>{<span class="st">'class'</span>: <span class="st">'target'</span>})  <span class="co"># target con 4 categorías</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a></span>
+<span id="cb12-6"><a href="#cb12-6"></a></span>
+<span id="cb12-7"><a href="#cb12-7"></a><span class="co"># Modelo de estructura</span></span>
+<span id="cb12-8"><a href="#cb12-8"></a>structure_model <span class="op">=</span> bn.structure_learning.fit(datos, methodtype<span class="op">=</span><span class="st">'tan'</span>, root_node<span class="op">=</span><span class="st">"doors"</span>, class_node<span class="op">=</span><span class="st">"target"</span>) <span class="co"># uso de hill-climbing</span></span>
+<span id="cb12-9"><a href="#cb12-9"></a></span>
+<span id="cb12-10"><a href="#cb12-10"></a><span class="co"># nota: en este caso no estamos definiendo un padre para obtener la estructura bayesian</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb13"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1"></a>structure_model[<span class="st">"adjmat"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb14-2"><a href="#cb14-2"></a>bn.plot(model)</span>
+<span id="cb14-3"><a href="#cb14-3"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<blockquote class="blockquote">
+<p>Tanto del cuadro como del grafo, podemos ver que:</p>
+</blockquote>
+<blockquote class="blockquote">
+<ul>
+<li><code>target</code> es padre de: <code>safety</code>, <code>lug_boot</code> y <code>person</code></li>
+<li><code>target</code> es hijo de: <code>buying</code> y <code>maint</code></li>
+</ul>
+</blockquote>
+</section>
+<section id="clasificadores" class="level3" data-number="2.2.4">
+<h3 data-number="2.2.4" class="anchored" data-anchor-id="clasificadores"><span class="header-section-number">2.2.4</span> Clasificadores</h3>
+<p>Como determinar la estructura de la red bayesiana es una tarea realmente compleja, la mayor parte de los modelos de clasificación basados en redes bayesianas suelen ser modificaciones del clasificador Naïve-Bayes.</p>
+<p>A día de hoy, existen muchos clasificadores de forma que se exponen brevemente tres de los más utilizados.</p>
+<p><strong>Tan: Tree Augmented Naïve Bayes</strong></p>
+<p>En el modelo TAN todos los atributos tienen como padre a otro atributo como mucho, además de la clase en sí, de forma que cada atributo obtiene un arco aumentado apuntando a él. <img src="imagenes/capitulo2/modelo_tan.jpg" id="fig-modelo_tan" class="img-fluid" alt="Modelo TAN"></p>
+<p><strong>Ban: Naïve Bayes aumentado</strong></p>
+<p>En este modelo se incorporan nuevos arcos entre todas las variables con la limitación de que no formen ciclos. Destacar la relevancia de este clasificador ya que su estructura es capaz de representar cualquier forma de red bayesiana. <img src="imagenes/capitulo2/topologia_bayesiana.jpg" id="fig-modelo_ban.jpg" class="img-fluid" alt="Modelo BAN"></p>
+<p><strong>AODE: Average One-Dependence Estimators</strong></p>
+<p>Al igual que el algoritmo TAN, cada variable tiene como padre a la variable clase y como máximo a otro atributo. Sin embargo, la principal diferencia respecto al modelo anterior tiene lugar en la forma de obtener la predicción definitiva del modelo. Dicha predicción consiste en: - El algoritmo establece posibles estructuras de red compatibles con el problema y, en función de ésta, hace una predicción de la clase - La predicción final se obtiene como la media ponderada de las predicciones anteriores <img src="imagenes/capitulo2/modelo_aode.png" id="fig-modelo_aode.png" class="img-fluid" alt="Modelo AODE"></p>
+<p>Una vez visto la parte teórica entramos en detalle a nivel práctico.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1"></a>structure_tan_model <span class="op">=</span> bn.structure_learning.fit(</span>
+<span id="cb15-2"><a href="#cb15-2"></a>    datos,</span>
+<span id="cb15-3"><a href="#cb15-3"></a>    methodtype<span class="op">=</span><span class="st">'tan'</span>,</span>
+<span id="cb15-4"><a href="#cb15-4"></a>    root_node<span class="op">=</span><span class="st">"doors"</span>, <span class="co"># hay que tener en cuenta algún hijo que no tenga más padre que el target</span></span>
+<span id="cb15-5"><a href="#cb15-5"></a>    class_node<span class="op">=</span><span class="st">"target"</span>  <span class="co"># en el modelo tan hay que tener una clase/padre)</span></span>
+<span id="cb15-6"><a href="#cb15-6"></a>) </span>
+<span id="cb15-7"><a href="#cb15-7"></a>parameter_model <span class="op">=</span> bn.parameter_learning.fit(structure_tan_model, datos, methodtype<span class="op">=</span><span class="st">'bayes'</span>, verbose<span class="op">=</span><span class="dv">0</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1"></a>structure_tan_model[<span class="st">"model_edges"</span>] <span class="co"># bordes y nodos. También podría pintarse como en el caso anterior</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ul>
+<li>Obención de las <code>probabilidades condicionadas</code></li>
+</ul>
+<div class="sourceCode" id="cb17"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1"></a><span class="co"># Probabilidades condicionadas</span></span>
+<span id="cb17-2"><a href="#cb17-2"></a></span>
+<span id="cb17-3"><a href="#cb17-3"></a>CPDs <span class="op">=</span> bn.print_CPD(parameter_model, verbose<span class="op">=</span><span class="dv">0</span>)  <span class="co"># esto es un diccionario de dataframes (clave cada columna del df</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>- Para doors:</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1"></a>CPDs[<span class="st">"doors"</span>][CPDs[<span class="st">"doors"</span>][<span class="st">"target"</span>] <span class="op">==</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<pre><code>- Para maint (y primera clase del target):</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1"></a>CPDs[<span class="st">"maint"</span>][CPDs[<span class="st">"maint"</span>][<span class="st">"target"</span>] <span class="op">==</span> <span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Obtención de las <code>Predicciones sobre la muestra</code></p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1"></a>feats <span class="op">=</span> <span class="bu">list</span>(datos.columns)</span>
+<span id="cb22-2"><a href="#cb22-2"></a>feats.remove(<span class="st">"target"</span>)</span>
+<span id="cb22-3"><a href="#cb22-3"></a></span>
+<span id="cb22-4"><a href="#cb22-4"></a><span class="co"># dado las evidencias de dos variables, calculamos la probabilidad de la clase</span></span>
+<span id="cb22-5"><a href="#cb22-5"></a>query <span class="op">=</span> bn.inference.fit(parameter_model, variables<span class="op">=</span>[<span class="st">"target"</span>], evidence<span class="op">=</span>{<span class="st">'doors'</span>:<span class="dv">2</span>, <span class="st">'lug_boot'</span>: <span class="st">'small'</span>}, verbose<span class="op">=</span><span class="dv">0</span>)</span>
+<span id="cb22-6"><a href="#cb22-6"></a></span>
+<span id="cb22-7"><a href="#cb22-7"></a>query.df</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Por último, presentamos un ejemplo de uso de clasificador bayesiano empleando la librería <strong>pyAgrum</strong>. Esta librería es que es un contenedor de Python para la biblioteca aGrUM de C++. Proporciona una interfaz de alto nivel a la parte de aGrUM que permite crear, modelar, aprender, usar, calcular e integrar redes bayesianas y otros modelos gráficos probabilísticos como las redes de Markov o los modelos relacionales probabilísticos.</p>
+<p>La librería se integra adecuadamente con <em>scikit-learn</em> por lo que se recomienda su uso para desarrollar clasificadores bayesianos.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1"></a><span class="im">import</span> os</span>
+<span id="cb23-2"><a href="#cb23-2"></a></span>
+<span id="cb23-3"><a href="#cb23-3"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb23-4"><a href="#cb23-4"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb23-5"><a href="#cb23-5"></a></span>
+<span id="cb23-6"><a href="#cb23-6"></a><span class="im">import</span> pyAgrum.skbn <span class="im">as</span> skbn</span>
+<span id="cb23-7"><a href="#cb23-7"></a><span class="im">import</span> pyAgrum.lib.notebook <span class="im">as</span> gnb</span>
+<span id="cb23-8"><a href="#cb23-8"></a></span>
+<span id="cb23-9"><a href="#cb23-9"></a>datos <span class="op">=</span> pd.read_csv(<span class="st">"../datos/credit_g.csv"</span>)</span>
+<span id="cb23-10"><a href="#cb23-10"></a></span>
+<span id="cb23-11"><a href="#cb23-11"></a>datos.info()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb24"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1"></a><span class="co"># Pasamos las variables a categóricas</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>datos[<span class="st">'checking_status'</span>] <span class="op">=</span> datos[<span class="st">'checking_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-3"><a href="#cb24-3"></a>datos[<span class="st">'credit_history'</span>] <span class="op">=</span> datos[<span class="st">'credit_history'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-4"><a href="#cb24-4"></a>datos[<span class="st">'purpose'</span>] <span class="op">=</span> datos[<span class="st">'purpose'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-5"><a href="#cb24-5"></a>datos[<span class="st">'savings_status'</span>] <span class="op">=</span> datos[<span class="st">'savings_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-6"><a href="#cb24-6"></a>datos[<span class="st">'employment'</span>] <span class="op">=</span> datos[<span class="st">'employment'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-7"><a href="#cb24-7"></a>datos[<span class="st">'personal_status'</span>] <span class="op">=</span> datos[<span class="st">'personal_status'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-8"><a href="#cb24-8"></a>datos[<span class="st">'other_parties'</span>] <span class="op">=</span> datos[<span class="st">'other_parties'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-9"><a href="#cb24-9"></a>datos[<span class="st">'property_magnitude'</span>] <span class="op">=</span> datos[<span class="st">'property_magnitude'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-10"><a href="#cb24-10"></a>datos[<span class="st">'other_payment_plans'</span>] <span class="op">=</span> datos[<span class="st">'other_payment_plans'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-11"><a href="#cb24-11"></a>datos[<span class="st">'housing'</span>] <span class="op">=</span> datos[<span class="st">'housing'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-12"><a href="#cb24-12"></a>datos[<span class="st">'job'</span>] <span class="op">=</span> datos[<span class="st">'job'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-13"><a href="#cb24-13"></a>datos[<span class="st">'property_magnitude'</span>] <span class="op">=</span> datos[<span class="st">'property_magnitude'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-14"><a href="#cb24-14"></a>datos[<span class="st">'own_telephone'</span>] <span class="op">=</span> datos[<span class="st">'own_telephone'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-15"><a href="#cb24-15"></a>datos[<span class="st">'foreign_worker'</span>] <span class="op">=</span> datos[<span class="st">'foreign_worker'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-16"><a href="#cb24-16"></a>datos[<span class="st">'class'</span>] <span class="op">=</span> datos[<span class="st">'class'</span>].astype(<span class="st">'category'</span>)</span>
+<span id="cb24-17"><a href="#cb24-17"></a></span>
+<span id="cb24-18"><a href="#cb24-18"></a><span class="co"># La variable class es una variable reservada en diferentes módulos de Python -&gt; reemplazar por por target</span></span>
+<span id="cb24-19"><a href="#cb24-19"></a>datos.rename(columns<span class="op">=</span>{<span class="st">'class'</span>: <span class="st">'target'</span>}, inplace<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb24-20"><a href="#cb24-20"></a>datos[<span class="st">'target'</span>]<span class="op">=</span>np.where(datos[<span class="st">'target'</span>]<span class="op">==</span><span class="st">'good'</span>, <span class="dv">0</span>, <span class="dv">1</span>) <span class="co"># cambio en la codificación por sencillez en el preprocesado</span></span>
+<span id="cb24-21"><a href="#cb24-21"></a></span>
+<span id="cb24-22"><a href="#cb24-22"></a><span class="co"># Definición de la muestra de trabajo</span></span>
+<span id="cb24-23"><a href="#cb24-23"></a>datos_entrada <span class="op">=</span> datos.drop(<span class="st">'target'</span>, axis<span class="op">=</span><span class="dv">1</span>) <span class="co"># Datos de entrada</span></span>
+<span id="cb24-24"><a href="#cb24-24"></a>datos_entrada <span class="op">=</span> pd.get_dummies(datos_entrada, drop_first<span class="op">=</span><span class="va">True</span>, dtype<span class="op">=</span><span class="bu">int</span>) <span class="co">#conversión a variables dummy</span></span>
+<span id="cb24-25"><a href="#cb24-25"></a></span>
+<span id="cb24-26"><a href="#cb24-26"></a>target <span class="op">=</span> datos[<span class="st">"target"</span>] <span class="co"># muestra del target</span></span>
+<span id="cb24-27"><a href="#cb24-27"></a></span>
+<span id="cb24-28"><a href="#cb24-28"></a><span class="im">from</span> sklearn.preprocessing <span class="im">import</span> StandardScaler</span>
+<span id="cb24-29"><a href="#cb24-29"></a><span class="im">from</span> sklearn.model_selection <span class="im">import</span> train_test_split, RepeatedStratifiedKFold, GridSearchCV</span>
+<span id="cb24-30"><a href="#cb24-30"></a></span>
+<span id="cb24-31"><a href="#cb24-31"></a><span class="co"># Partición de la muestra</span></span>
+<span id="cb24-32"><a href="#cb24-32"></a></span>
+<span id="cb24-33"><a href="#cb24-33"></a>test_size <span class="op">=</span> <span class="fl">0.3</span> <span class="co"># muestra para el test </span></span>
+<span id="cb24-34"><a href="#cb24-34"></a>seed <span class="op">=</span> <span class="dv">222</span> <span class="co"># semilla</span></span>
+<span id="cb24-35"><a href="#cb24-35"></a></span>
+<span id="cb24-36"><a href="#cb24-36"></a>X_train, X_test, y_train, y_test <span class="op">=</span> train_test_split(</span>
+<span id="cb24-37"><a href="#cb24-37"></a>    datos_entrada, target, test_size<span class="op">=</span>test_size, random_state<span class="op">=</span>seed, stratify<span class="op">=</span>target</span>
+<span id="cb24-38"><a href="#cb24-38"></a>)</span>
+<span id="cb24-39"><a href="#cb24-39"></a></span>
+<span id="cb24-40"><a href="#cb24-40"></a><span class="co"># Estandarización de la muestra</span></span>
+<span id="cb24-41"><a href="#cb24-41"></a>esc <span class="op">=</span> StandardScaler().fit(X_train) <span class="co"># valores media y std de los datos de train</span></span>
+<span id="cb24-42"><a href="#cb24-42"></a></span>
+<span id="cb24-43"><a href="#cb24-43"></a><span class="co"># aplicación a los datos de train y test</span></span>
+<span id="cb24-44"><a href="#cb24-44"></a>X_train_esc <span class="op">=</span> esc.transform(X_train)</span>
+<span id="cb24-45"><a href="#cb24-45"></a>X_test_esc <span class="op">=</span> esc.transform(X_test)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1"></a><span class="co"># Creación del clasificador TAN en python</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>bayesian_network <span class="op">=</span> skbn.BNClassifier(</span>
+<span id="cb25-3"><a href="#cb25-3"></a>    learningMethod<span class="op">=</span><span class="st">'TAN'</span>,</span>
+<span id="cb25-4"><a href="#cb25-4"></a>    prior<span class="op">=</span><span class="st">'Smoothing'</span>,</span>
+<span id="cb25-5"><a href="#cb25-5"></a>    scoringType<span class="op">=</span><span class="st">'BIC'</span>,</span>
+<span id="cb25-6"><a href="#cb25-6"></a>    priorWeight<span class="op">=</span><span class="fl">0.5</span>,</span>
+<span id="cb25-7"><a href="#cb25-7"></a>    discretizationStrategy<span class="op">=</span><span class="st">'quantile'</span>,</span>
+<span id="cb25-8"><a href="#cb25-8"></a>    usePR<span class="op">=</span><span class="va">True</span>,</span>
+<span id="cb25-9"><a href="#cb25-9"></a>    significant_digit <span class="op">=</span> <span class="dv">6</span></span>
+<span id="cb25-10"><a href="#cb25-10"></a>)</span>
+<span id="cb25-11"><a href="#cb25-11"></a></span>
+<span id="cb25-12"><a href="#cb25-12"></a>bayesian_network.fit(X_train, y_train) <span class="co"># ajuste del modelo</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1"></a><span class="im">from</span> sklearn.metrics <span class="im">import</span> accuracy_score</span>
+<span id="cb26-2"><a href="#cb26-2"></a></span>
+<span id="cb26-3"><a href="#cb26-3"></a><span class="co"># predicciones para la muestra de train y test</span></span>
+<span id="cb26-4"><a href="#cb26-4"></a></span>
+<span id="cb26-5"><a href="#cb26-5"></a>train_probs <span class="op">=</span> bn.predict_proba(X_train)  </span>
+<span id="cb26-6"><a href="#cb26-6"></a>test_probs <span class="op">=</span> bn.predict_proba(X_test)</span>
+<span id="cb26-7"><a href="#cb26-7"></a></span>
+<span id="cb26-8"><a href="#cb26-8"></a><span class="co"># predict-proba proporciona las probabilidades</span></span>
+<span id="cb26-9"><a href="#cb26-9"></a></span>
+<span id="cb26-10"><a href="#cb26-10"></a><span class="kw">def</span> preds_ones(probs, threshold <span class="op">=</span> <span class="fl">0.5</span>):</span>
+<span id="cb26-11"><a href="#cb26-11"></a>    <span class="cf">return</span> np.where(probs[:, <span class="dv">0</span>] <span class="op">&gt;</span> threshold, <span class="dv">0</span>, <span class="dv">1</span>)</span>
+<span id="cb26-12"><a href="#cb26-12"></a></span>
+<span id="cb26-13"><a href="#cb26-13"></a>y_train_pred <span class="op">=</span> preds_ones(train_probs)</span>
+<span id="cb26-14"><a href="#cb26-14"></a>y_test_pred <span class="op">=</span> preds_ones(tests_probs)</span>
+<span id="cb26-15"><a href="#cb26-15"></a></span>
+<span id="cb26-16"><a href="#cb26-16"></a><span class="bu">print</span>(<span class="ss">f'Accuracy (train) </span><span class="sc">{</span><span class="bu">round</span>(accuracy_score(y_train, y_train_pred),<span class="dv">2</span>)<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb26-17"><a href="#cb26-17"></a><span class="bu">print</span>(<span class="ss">f'Accuracy (test) </span><span class="sc">{</span><span class="bu">round</span>(accuracy_score(y_test, y_test_pred), <span class="dv">2</span>)<span class="sc">}</span><span class="ss">'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="modelos-ocultos-de-markov" class="level2" data-number="2.3">
+<h2 data-number="2.3" class="anchored" data-anchor-id="modelos-ocultos-de-markov"><span class="header-section-number">2.3</span> Modelos Ocultos de Markov</h2>
+<section id="cadenas-de-markov" class="level3" data-number="2.3.1">
+<h3 data-number="2.3.1" class="anchored" data-anchor-id="cadenas-de-markov"><span class="header-section-number">2.3.1</span> Cadenas de Markov</h3>
+<p>Una cadena de Markov es un sistema matemático que experimenta transiciones de un estado a otro de acuerdo con un conjunto dado de reglas probabilísticas. La siguiente imagen presenta una representación gráfica de una cadena de Markov.</p>
+<div id="fig-cadena_markov.jpg" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-cadena_markov.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/cadena_markov.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-cadena_markov.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.4: Cadena Markow
+</figcaption>
+</figure>
+</div>
+<p>Como puede verse, una cadena de Markov puede ser planteada como un gráfico dirigido en el que los nodos son los estados y los arcos contienen la probabilidad de pasar de un estado a otro.</p>
+<p>Las cadenas de Markov son procesos estocásticos pero se diferencian en que carecen de memoria. Así, en un proceso de Markov la probabilidad del siguiente estado del sistema depende solamente del estado actual del sistema y no de ningún estado anterior.</p>
+<div style="text-align:center;">
+<p><span class="math display">\[P(x_i│x_0 … x_{i-1})= P(x_i│x_{i-1})\]</span></p>
+</div>
+<p>La expresión anterior se conoce como <strong>propiedad de Markov</strong>.</p>
+<p>Es importante destacar que una cadena de Markov puede ser vista como una red bayesiana en la que cada nodo tiene una tabla de probabilidad correspondiente a <span class="math inline">\(P(x_t│x_{t-1})\)</span> y es a misma para todos los nodos salvo para el instante inicial.</p>
+<div id="fig-topologia_cadena_markov2.jpg" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-topologia_cadena_markov2.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/cadena_markov2.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-topologia_cadena_markov2.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.5: Cadena Markov
+</figcaption>
+</figure>
+</div>
+<p>En toda cadena de Markov es necesario definir una matriz de transición, <em>T</em>, la cual contiene la información sobre la probabilidad de transición entre los diferentes estados del sistema. Como hecho relevante, cada fila de la matriz debe ser un vector de probabilidad y la suma de todos sus términos debe ser igual a la unidad.</p>
+<p>Asimismo, las matrices de transición tienen la propiedad de que el producto de las matrices posteriores puede describir las probabilidades de transición a lo largo de un intervalo de tiempo. Esta característica permite modelar la probabilidad de estar en un determinado estado después de <em>n</em> pasos como:</p>
+<div style="text-align:center;">
+<p><span class="math display">\[p^n= p^0* T^n\]</span></p>
+</div>
+<p>Veamos un ejemplo con el que facilitar la comprensión del funcionamiento de una cadena de Markov.</p>
+<blockquote class="blockquote">
+<p><strong>Un grupo farmacéutico ha sacado al mercado tres pomadas hace pocas semanas. Con el fin de conocer su acogida así como el comportamiento futuro de los potenciales clientes ante las tres variantes del producto ha realizado un estudio de mercado. De dicho estudio se conocen las probabilidades de cambio de un tipo de pomada a otra.</strong></p>
+</blockquote>
+<blockquote class="blockquote">
+<p>La matriz de transición para <em>T</em> es:</p>
+</blockquote>
+<blockquote class="blockquote">
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T = \begin{pmatrix}
+0.80 &amp; 0.10 &amp; 0.10 \\
+0.03 &amp; 0.95 &amp; 0.02 \\
+0.20 &amp; 0.05 &amp; 0.75 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>Sabiendo que actualmente, la participación en el mercado de las tres pomadas es:</p>
+</blockquote>
+<blockquote class="blockquote">
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+p = \begin{pmatrix}
+0.30 \\
+0.45 \\
+0.25 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>¿Cuáles serán las participaciones de mercado de cada marca en dos meses más?</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>La matriz de transición para <span class="math inline">\(T^2\)</span> es:</p>
+</blockquote>
+<blockquote class="blockquote">
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T^2 = \begin{pmatrix}
+0.663 &amp; 0.180 &amp; 0.155 \\
+0.057 &amp; 0.907 &amp; 0.037 \\
+0.312 &amp; 0.105 &amp; 0.584 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>De forma que usando la fórmula anterior, se tiene:</p>
+</blockquote>
+<blockquote class="blockquote">
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+p^2 = p^0 \cdot T^2 = \begin{pmatrix}
+0.30 &amp; 0.45 &amp; 0.25
+\end{pmatrix} \begin{pmatrix}
+0.663 &amp; 0.180 &amp; 0.155 \\
+0.057 &amp; 0.907 &amp; 0.037 \\
+0.312 &amp; 0.105 &amp; 0.584 \\
+\end{pmatrix} = \begin{pmatrix}
+0.302 &amp; 0.488 &amp; 0.209
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>En vista de los resultados, la cuota de mercado de cada tipo de pomada variará en los dos meses siguientes en: - Pomada 1: de un 30% a 30,2% (estable) - Pomada 2: de un 45% a un 48,8% (leve aumento) - Pomada 3: de un 25% a un 20,9% (ligera caída)</p>
+</blockquote>
+</section>
+<section id="cadena-de-markov-absorvente" class="level3" data-number="2.3.2">
+<h3 data-number="2.3.2" class="anchored" data-anchor-id="cadena-de-markov-absorvente"><span class="header-section-number">2.3.2</span> Cadena de Markov absorvente</h3>
+<p>Una <strong>cadena de Markov absorbente</strong> es una cadena de Markov en la que para algunos estados una vez ingresados, no es posible salir. Sin embargo, este es solo uno de los requisitos previos para que una cadena de Markov sea una cadena de Markov absorbente. Para que sea una cadena de Markov absorbente, todos los demás estados transitorios deben poder alcanzar el estado absorbente con una probabilidad de 1.</p>
+<p>Con el fin de ayudar al entendimiento del comportamiento de una <strong>cadena de Markov arbsorvente</strong>, se plantea una simulación en python sobre la calidad creditia de <em>n</em> individuos y su comportamiento durante un año (12 pagos).</p>
+<p>Suponiendo un modelo de impago bancario con los siguientes tres estados: - Pago al día - Pago con retraso - Impago (estado absorbente)</p>
+<p>Así, la matriz de transición para esta cadena de Markov es:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T = \begin{pmatrix}
+0.8 &amp; 0.1 &amp; 0.0 \\
+0.2 &amp; 0.4 &amp; 0.4 \\
+0.0 &amp; 0.0 &amp; 1.0 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+<p>Esto significa que hay un 80% de probabilidad de que un individuo que paga al día continúe pagando al día, un 20% de probabilidad de que pase a un estado de pago con retraso, y un 0% de probabilidad de que entre en estado de impago (para pasar a impago debe pasar previamente por pago con retraso). Además, hay un 20% de probabilidad de que un individuo en estado de pago con retraso vuelva al estado de pago al día, un 40% de probabilidad de que permanezca en estado de pago con retraso y un 20% de probabilidad de que entre en estado de impago. Por último, el estado de impago es absorbente, lo que significa que una vez que un individuo entra en estado de impago, permanece allí indefinidamente.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb27-2"><a href="#cb27-2"></a></span>
+<span id="cb27-3"><a href="#cb27-3"></a>np.random.seed(<span class="dv">123</span>)</span>
+<span id="cb27-4"><a href="#cb27-4"></a></span>
+<span id="cb27-5"><a href="#cb27-5"></a><span class="co"># Matriz de transición completa</span></span>
+<span id="cb27-6"><a href="#cb27-6"></a>transition_matrix <span class="op">=</span> np.array([[<span class="fl">0.8</span>, <span class="fl">0.2</span>, <span class="fl">0.0</span>],  <span class="co"># De pago al día a pago con retraso o impago</span></span>
+<span id="cb27-7"><a href="#cb27-7"></a>                              [<span class="fl">0.45</span>, <span class="fl">0.4</span>, <span class="fl">0.15</span>],  <span class="co"># De pago con retraso a pago al día o impago</span></span>
+<span id="cb27-8"><a href="#cb27-8"></a>                              [<span class="fl">0.0</span>, <span class="fl">0.0</span>, <span class="fl">1.0</span>]]) <span class="co"># De impago a impago (estado de absorción)</span></span>
+<span id="cb27-9"><a href="#cb27-9"></a></span>
+<span id="cb27-10"><a href="#cb27-10"></a><span class="co"># Muestra de individuos + número de pagos</span></span>
+<span id="cb27-11"><a href="#cb27-11"></a>n_samples <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb27-12"><a href="#cb27-12"></a>n_pagos <span class="op">=</span> <span class="dv">12</span></span>
+<span id="cb27-13"><a href="#cb27-13"></a></span>
+<span id="cb27-14"><a href="#cb27-14"></a>y <span class="op">=</span> np.zeros(n_samples, dtype<span class="op">=</span><span class="bu">int</span>)  <span class="co"># Todos los individuos comienzan en estado de pago al día</span></span>
+<span id="cb27-15"><a href="#cb27-15"></a></span>
+<span id="cb27-16"><a href="#cb27-16"></a>muestra_dict <span class="op">=</span> {} <span class="co"># Diccionario para recoger los pagos de cada muestra</span></span>
+<span id="cb27-17"><a href="#cb27-17"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(n_samples):</span>
+<span id="cb27-18"><a href="#cb27-18"></a>    <span class="co"># Generar transiciones de estado basadas en la matriz de transición completa</span></span>
+<span id="cb27-19"><a href="#cb27-19"></a>    current_state <span class="op">=</span> <span class="dv">0</span>  <span class="co"># Estado inicial: pago al día</span></span>
+<span id="cb27-20"><a href="#cb27-20"></a>    pagos_muestra_list <span class="op">=</span> [] <span class="co"># Obtener secuencia en cada mes de pago</span></span>
+<span id="cb27-21"><a href="#cb27-21"></a>    <span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(n_pagos):  <span class="co"># Realizar los 12 pagos</span></span>
+<span id="cb27-22"><a href="#cb27-22"></a>        <span class="cf">if</span> current_state <span class="op">==</span> <span class="dv">0</span>:  <span class="co"># Si estamos en el estado de pago al día</span></span>
+<span id="cb27-23"><a href="#cb27-23"></a>            <span class="co"># solo nos quedamos con las posibles transiciones (no es posible ir al impago sin tener retraso en pago)</span></span>
+<span id="cb27-24"><a href="#cb27-24"></a>            next_state <span class="op">=</span> np.random.choice([<span class="dv">0</span>, <span class="dv">1</span>], p<span class="op">=</span>transition_matrix[current_state][<span class="dv">0</span>:<span class="dv">2</span>])</span>
+<span id="cb27-25"><a href="#cb27-25"></a>        <span class="cf">elif</span> current_state <span class="op">==</span> <span class="dv">1</span>:  <span class="co"># Si estamos en el estado de pago con retraso</span></span>
+<span id="cb27-26"><a href="#cb27-26"></a>            <span class="co"># una vez estamos en retraso pago podemos volver a regular pagos (pago al día) o ir a impoago</span></span>
+<span id="cb27-27"><a href="#cb27-27"></a>            next_state <span class="op">=</span> np.random.choice([<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>], p<span class="op">=</span>transition_matrix[current_state])</span>
+<span id="cb27-28"><a href="#cb27-28"></a>        <span class="cf">else</span>:  <span class="co"># Si estamos en el estado de impago</span></span>
+<span id="cb27-29"><a href="#cb27-29"></a>            y[i] <span class="op">=</span> <span class="dv">1</span>  <span class="co"># estado absorbente</span></span>
+<span id="cb27-30"><a href="#cb27-30"></a>            <span class="cf">break</span></span>
+<span id="cb27-31"><a href="#cb27-31"></a>        current_state <span class="op">=</span> next_state</span>
+<span id="cb27-32"><a href="#cb27-32"></a>        pagos_muestra_list.append(current_state)</span>
+<span id="cb27-33"><a href="#cb27-33"></a>        muestra_dict[<span class="ss">f"Individuo_</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">"</span>] <span class="op">=</span> pagos_muestra_list</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>En el diccionario <code>muestra_dict</code> se ha guardado el comportamiento de cada individuo a lo largo de los 12 pagos posteriores al punto inicial.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1"></a>muestra_dict</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Como puede verse, la mayor parte de individuos no llegan al estado de impago y esto es consecuencia de las probabilidades existentes en la matriz de transición de partida.</p>
+<p>La secuencia de pagos del <em>Individuo_5</em> hace que sea de interés focalizarse en él para detallar el impacto que tienen las cadenas de markov. Como puede verse, al inicio de pago se empieza a retrasar hasta volver a regularizar sus pagos a mediados del segundo trimestre. Tras esta regularización, meses después vuelve a caer de estado.</p>
+<p>Las <strong>cadenas de Markov</strong> absorbentes tienen algunas propiedades específicas que las diferencian de las cadenas de Markov más simples. La más destacada es la referida a la forma en que la matriz de transición puede ser escrita. Sea una cadena con <em>t</em> estados transitorios y r estados absorbentes, la matriz de transición <em>T</em> puede escribirse en su forma canónica como:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T = \begin{pmatrix}
+Q &amp; R \\
+0 &amp; I_t \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+<p>Donde <em>Q</em> es una matriz de <em>txt</em>, <em>R</em> es una matriz de <em>txr</em>, <em>0</em> es una matriz de ceros de <em>rxt</em> e <em>It</em> es la matriz identidad de <em>txt</em>.</p>
+<p>En particular, la descomposición de la matriz de transición en la matriz fundamental permite ciertos cálculos, como el <em>número esperado de pasos hasta la absorción de cada estado</em>. La matriz fundamental <em>N</em> se calcula de la siguiente manera:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+N= (I_t-Q)^{-1}
+\]</span></p>
+<div>
+
+<p>Siendo <em>I_t</em> es la matriz identidad de <em>txt</em>. Así, para obtener el <em>número esperado de pasos</em> se calcula como:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+n= N*1
+\]</span></p>
+<div>
+
+<p>Donde 1 denota un vector columna de valor uno y longitud igual al número estados transitorios.</p>
+<p>Por último, la probabilidad de que un estado transitorio sea absorbido es calculada como:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+p_{trans \rightarrow abs}= N * R
+\]</span></p>
+<div>
+
+<p>Veamos un ejemplo de Cadena de Markov absorbente con el que podamos ver en detalle estos cálculos matriciales:</p>
+<blockquote class="blockquote">
+<p><strong>Imaginemos un cliente en un casino. Por cada apuesta gana 1€ con probabilidad de 0.3 o pierde 1€ con probabilidad de 0.7. Sabiendo que la apuesta ha sido iniciada con 2 € y que el cliente se retirará se retirará si pierde todo el dinero o bien lo duplica. Se pide:</strong></p>
+</blockquote>
+<ul>
+<li><strong>Cuestión 1: Escribir la matriz de transición de una cadena de Markov</strong></li>
+<li><strong>Cuestión 2: Determinar el promedio de apuestas hasta que el juego termina</strong></li>
+<li><strong>Cuestión 3: Determinar la probabilidad de terminar el juego con 4€ o de marcharse de vacío</strong></li>
+</ul>
+<blockquote class="blockquote">
+<p>Cuestión 1: Del enunciado se conoce que se tienen 5 posibles estados (0, 1, 2, 3, 4) siendo los estados 0 y 4 absorbentes (pierde todo o duplica la apuesta, respectivamente). Teniendo en cuenta los posibles movimientos y las probabilidades asociadas se tiene:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T = \begin{pmatrix}
+t_{00} &amp; t_{01} &amp; t_{02} &amp; t_{03} &amp; t_{04} \\
+t_{10} &amp; t_{11} &amp; t_{12} &amp; t_{13} &amp; t_{14} \\
+t_{20} &amp; t_{21} &amp; t_{22} &amp; t_{23} &amp; t_{24} \\
+t_{30} &amp; t_{31} &amp; t_{32} &amp; t_{33} &amp; t_{34} \\
+t_{40} &amp; t_{41} &amp; t_{42} &amp; t_{43} &amp; t_{44} \\
+\end{pmatrix} = \begin{pmatrix}
+1 &amp; 0 &amp; 0 &amp; 0 &amp; 0 \\
+0.7 &amp; 0 &amp; 0.3 &amp; 0 &amp; 0 \\
+0 &amp; 0.7 &amp; 0 &amp; 0.3 &amp; 0 \\
+0 &amp; 0 &amp; 0.7 &amp; 0 &amp; 0.3 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>Cuestión 2: Se escribe la matriz T en su forma canónica. Notar que para ello es necesario reorganizar los estados (ahora, los estados absorbentes están en las últimas filas de la matriz T).</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+T =
+\begin{pmatrix}
+Q &amp; R \\
+0 &amp; I_t \\
+\end{pmatrix}
+= \begin{pmatrix}
+t_{11} &amp; t_{12} &amp; t_{13} &amp; t_{10} &amp; t_{14} \\
+t_{21} &amp; t_{22} &amp; t_{23} &amp; t_{20} &amp; t_{24} \\
+t_{31} &amp; t_{32} &amp; t_{33} &amp; t_{30} &amp; t_{34} \\
+t_{01} &amp; t_{02} &amp; t_{03} &amp; t_{00} &amp; t_{04} \\
+t_{41} &amp; t_{42} &amp; t_{43} &amp; t_{40} &amp; t_{44} \\
+\end{pmatrix} = \begin{pmatrix}
+0 &amp; 0.3 &amp; 0 &amp; 0.7 &amp; 0 \\
+0.7 &amp; 0 &amp; 0.3 &amp; 0 &amp; 0 \\
+0 &amp; 0.7 &amp; 0 &amp; 0 &amp; 0.3 \\
+0 &amp; 0 &amp; 0 &amp; 1 &amp; 0 \\
+0 &amp; 0 &amp; 0 &amp; 0 &amp; 1 \\
+\end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>De forma que Q y R son:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[ Q = \begin{pmatrix} 0.0 &amp; 0.3 &amp; 0.0 \\ 0.7 &amp; 0.0 &amp; 0.3 \\ 0.0 &amp; 0.7 &amp; 0.0 \end{pmatrix}  \]</span> <span class="math display">\[ R = \begin{pmatrix} 0.7 &amp; 0.0 \\ 0.0 &amp; 0.0 \\ 0.0 &amp; 0.3 \end{pmatrix} \]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>El número de apuestas hasta terminar el juego es:</p>
+</blockquote>
+<blockquote class="blockquote">
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+N= (I_t-Q)^{-1} * 1 = {\begin{pmatrix} 0.0 &amp; 0.3 &amp; 0.0 \\ 0.7 &amp; 0.0 &amp; 0.3 \\ 0.0 &amp; 0.7 &amp; 0.0 \end{pmatrix}}^{-1} *
+\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix} =
+\begin{pmatrix} 1.362 &amp; 0.517 &amp; 0.155 \\ 1.207 &amp; 1.724 &amp; 0.517 \\ 0.845 &amp;  1.207 &amp; 1.362 \end{pmatrix} *
+\begin{pmatrix} 1 \\ 1 \\ 1 \end{pmatrix} = \begin{pmatrix} 2.034 \\ 3.448 \\ 3.414 \end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>Teniendo en cuenta que el cliente empezó su apuesta con 2€, el número de apuestas esperadas hasta que el juego acabe son 3.448€.</p>
+</blockquote>
+<blockquote class="blockquote">
+<p>Cuestión 3: En este caso, se sabe que la probabilidad de llegar a un estado absorbente desde uno transitorio sigue la siguiente expresión:</p>
+<div style="text-align:center;">
+
+<p><span class="math display">\[
+p_{trans \rightarrow abs}= N * R = (I_t-Q)^{-1} * R =
+\begin{pmatrix} 1.362 &amp; 0.517 &amp; 0.155 \\ 1.207 &amp; 1.724 &amp; 0.517 \\ 0.845 &amp;  1.207 &amp; 1.362 \end{pmatrix} *
+\begin{pmatrix} 0.7 &amp; 0\\ 0 &amp; 0 \\ 0 &amp; 0.3 \end{pmatrix} = \begin{pmatrix} 0.953 &amp; 0.046 \\ 0.845 &amp; 0.155\\ 0.591 &amp; 0.409 \end{pmatrix}
+\]</span></p>
+<div>
+
+</div></div></blockquote>
+<blockquote class="blockquote">
+<p>Así, la probabilidad de que el cliente acabe con 4€ es de 15.5%. Por su parte, se tiene un 84.5% de posibilidades de que se vaya de vacío.</p>
+</blockquote>
+</div></div></div></div></div></div></div></div></div></div></section>
+<section id="modelos-ocultos-de-markov-1" class="level3" data-number="2.3.3">
+<h3 data-number="2.3.3" class="anchored" data-anchor-id="modelos-ocultos-de-markov-1"><span class="header-section-number">2.3.3</span> Modelos Ocultos de Markov</h3>
+<p>Los <strong>Modelos Ocultos de Markov</strong>, HMMs (por sus siglas en inglés) son una extensión de las cadenas de Markov y sirven para tratar tanto eventos observables (presentes en la cadena de entrada) como eventos ocultos que consideramos causales del modelo probabilístico. Los Modelos Ocultos de Markov son utilizados cuando se conocen las evidencias sobre un sistema pero no los estados tienen lugar de forma que buscan establecer la relación existente entre los estados visibles y los ocultos. Algunos ejemplos de uso de este tipo de modelos:</p>
+<ul>
+<li>Separación de secuencias de nucleótidos por sus características biológicas (exón-intrón)</li>
+<li>Relacionar proteínas con sus funcionalidades</li>
+<li>Localización de genes en las células eucariotas</li>
+<li>Reconocimiento del habla</li>
+<li>Etiquetado de texto y traducción automática</li>
+</ul>
+<p>En un HMM, para cada instante de tiempo o posición t en una secuencia se tiene:</p>
+<ul>
+<li>Una variable aleatoria <span class="math inline">\(X_t\)</span>, con posibles estados <span class="math inline">\(s_1, … ,s_n\)</span> (no observables directamente)</li>
+<li>Otra variable aleatoria <span class="math inline">\(E_t\)</span>, con posibles estados <span class="math inline">\(v_1, … ,v_m\)</span> (observaciones)</li>
+</ul>
+<p>Para un buen funcionamiento de este tipo de modelos se asume dos propiedades:</p>
+<ul>
+<li>Propiedad de Markov: en cada posición, el estado solo depende del estado en la posición inmediatamente anterior: <span class="math inline">\(P(X_t│Y, X_{t-1}) = P(X_t│X_{t-1})\)</span></li>
+<li>Indpendencia de las observaciones: en cada posición, la observación solo depende del estado en esa posición: <span class="math inline">\(P(E_t│Y, X_t )=P(E_t│X_t)\)</span></li>
+</ul>
+<p>De forma análoga a las cadenas de Markov, un HMM también puede ser expresado según una red bayesiana:</p>
+<div id="fig-hhm.jpg" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hhm.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/hhm.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hhm.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.6: HMM
+</figcaption>
+</figure>
+</div>
+<p>Así, cada nodo <span class="math inline">\(X_t\)</span> la misma tabla de probabilidad correspondiente a <span class="math inline">\(P(X_t│X_{t-1})\)</span> salvo en el instante anterior. Por el contrario, cada nodo <span class="math inline">\(E_t\)</span> tiene una única tabla de probabilidad correspondiente a <span class="math inline">\(P(E_t│X_t)\)</span>.</p>
+<p>Además de los estados ocultos y observables comentados anteriormente, un Modelo Oculto de Markov consta también de otros elementos que son citados a continuación:</p>
+<ul>
+<li>Respecto a los estados ocultos:
+<ul>
+<li>La matriz de probabilidades entre los estados, <em>A</em>, denominada matriz de transición. Así, <span class="math inline">\(a_{ij}=P(X_t=s_j│X_{t-1}=s_i)\)</span> es la probabilidad de pasar del estado si al estado <span class="math inline">\(s_j\)</span> Es importante destacar que el modelo probabilístico que describe la manera de transitar entre una posición y la siguiente no cambia a lo largo de la secuencia.</li>
+<li>El vector de probabilidades a priori de cada estado, <span class="math inline">\(\pi\)</span>, con <span class="math inline">\(\pi_i=P(x_1=s_i)\)</span> - Respecto a las observaciones: - La matriz de probabilidades de los observables, <em>B</em>, conocida como matriz de observación. Así, <span class="math inline">\(b_{ij}=P(E_t=v_j│X_t=s_i)\)</span> es la probabilidad de observar <span class="math inline">\(v_j\)</span> cuando el estado es <span class="math inline">\(s_i\)</span></li>
+</ul></li>
+</ul>
+<p>Es importante destacar que el modelo probabilístico que describe la emisión de la observación en cada estado no cambia a lo largo de la secuencia.</p>
+<p>Por tanto, un HMM está formado por la combinación de dos tipos de modelos: - El transicional el cual responde a los estados ocultos - El modelo de evidencias que tiene en cuenta la información disponible de las observaciones</p>
+<p>Un ejemplo básico sobre el uso de <em>Modelos Ocultos de Markov</em> en <strong>bioinformática</strong> se plantea a continuación. En este ejemplo, se parte de una secuencia de ADN ficticia (observaciones) y se hace uso de un HHM para predecir la probabilidad de los estados ocultos (“codificación de genes” y “regiones no codificantes”) en la secuencia de ADN.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb29-2"><a href="#cb29-2"></a><span class="im">from</span> hmmlearn <span class="im">import</span> hmm</span>
+<span id="cb29-3"><a href="#cb29-3"></a></span>
+<span id="cb29-4"><a href="#cb29-4"></a>np.random.seed(<span class="dv">444</span>)</span>
+<span id="cb29-5"><a href="#cb29-5"></a></span>
+<span id="cb29-6"><a href="#cb29-6"></a>dna_sequence <span class="op">=</span> <span class="st">"TCGAATCGAAGTATCGGCATTGGCTCGAGCGATCGATGCTAGCA"</span></span>
+<span id="cb29-7"><a href="#cb29-7"></a>states <span class="op">=</span> [<span class="st">"Gene"</span>, <span class="st">"Non-Gene"</span>]</span>
+<span id="cb29-8"><a href="#cb29-8"></a></span>
+<span id="cb29-9"><a href="#cb29-9"></a><span class="co"># Conversión de la secuencia de ADN a números para que el modelo HMM pueda procesarla</span></span>
+<span id="cb29-10"><a href="#cb29-10"></a><span class="co"># Por ejemplo, A=0, C=1, G=2, T=3</span></span>
+<span id="cb29-11"><a href="#cb29-11"></a>dna_encoded <span class="op">=</span> np.array([[<span class="dv">0</span> <span class="cf">if</span> base <span class="op">==</span> <span class="st">"A"</span> <span class="cf">else</span> <span class="dv">1</span> <span class="cf">if</span> base <span class="op">==</span> <span class="st">"C"</span> <span class="cf">else</span> <span class="dv">2</span> <span class="cf">if</span> base <span class="op">==</span> <span class="st">"G"</span> <span class="cf">else</span> <span class="dv">3</span> <span class="cf">for</span> base <span class="kw">in</span> dna_sequence]]).T</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1"></a><span class="co"># Definir y entrenar el modelo</span></span>
+<span id="cb30-2"><a href="#cb30-2"></a>model <span class="op">=</span> hmm.CategoricalHMM(n_components<span class="op">=</span><span class="dv">2</span>, n_iter<span class="op">=</span><span class="dv">100</span>) <span class="co"># las componentes son los estados</span></span>
+<span id="cb30-3"><a href="#cb30-3"></a>model.fit(dna_encoded) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb31"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1"></a>model.predict_proba(dna_encoded)[<span class="dv">0</span>:<span class="dv">20</span>] <span class="co"># probabilidades de decodificación</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb32"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1"></a><span class="co"># Decodificar los estados ocultos (genes vs no genes) utilizando el modelo entrenado</span></span>
+<span id="cb32-2"><a href="#cb32-2"></a>decoded_states <span class="op">=</span> model.predict(dna_encoded) <span class="co"># predict asume un threshold de 0.5</span></span>
+<span id="cb32-3"><a href="#cb32-3"></a></span>
+<span id="cb32-4"><a href="#cb32-4"></a><span class="co"># Decodificar los estados ocultos a sus etiquetas originales</span></span>
+<span id="cb32-5"><a href="#cb32-5"></a>decoded_states_labels <span class="op">=</span> [states[state] <span class="cf">for</span> state <span class="kw">in</span> decoded_states]</span>
+<span id="cb32-6"><a href="#cb32-6"></a></span>
+<span id="cb32-7"><a href="#cb32-7"></a><span class="bu">print</span>(<span class="ss">f"Secuencia de ADN: </span><span class="sc">{</span>dna_sequence<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb32-8"><a href="#cb32-8"></a><span class="bu">print</span>(<span class="ss">f"Estados ocultos predichos: </span><span class="sc">{</span>decoded_states_labels<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Dado una secuencia de observaciones <span class="math inline">\(o_1 o_2 … o_t\)</span>, mediante un <strong>Modelo Oculto de Markov</strong> se pueden responder a distintos tipos de problemas como: - Filtrado: permite conocer la probabilidad de que <span class="math inline">\(X_t=q\)</span> - Explicación más verosímil: también conocida como decodificación, permite conocer la secuencia de estados más probable.</p>
+<p>A continuación, se presenta un ejemplo para explicar en detalle el proceso de obtención del <strong>filtrado y de la explicación más verosímil en un Modelo Oculto de Markov</strong>.</p>
+<p><strong>Suponga un trabajador en una plataforma de petróleo que no tiene contacto con el exterior en todo un año. Debido a su profesión, desconoce la situación meteorológica de cada día (si llueve o no), pero todas las mañanas siempre ve llegar al gerente a su oficina. El gerente unos días viene con paraguas y otros no. Imagine entonces que un sistema formado por dos estados ocultos (lluvia, no lluvia) y dos observaciones (paraguas, no paraguas) es utilizado para pronosticar el tiempo por el trabajador. La siguiente imagen muestra la estructura de un Modelo Oculto de Markov en formato de red.</strong></p>
+<div id="fig-hhm_ejemplo.jpg" class="quarto-figure quarto-figure-center quarto-float anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-hhm_ejemplo.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="imagenes/capitulo2/hhm_ejemplo.jpg" class="img-fluid figure-img">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-hhm_ejemplo.jpg-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.7: Ejemplo HHM
+</figcaption>
+</figure>
+</div>
+<p>El ejemplo es detallado tanto siguiendo los cálculos “manualmente” como a partir de una implementación en python.</p>
+<p>Los vectors de información a priori como las matrices de probabilidad entre estados y las matrices de probablidad de observables se obtienen directamente del enunciado:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb33-2"><a href="#cb33-2"></a></span>
+<span id="cb33-3"><a href="#cb33-3"></a><span class="co"># Definir parámetros del modelo HMM como listas y diccionarios</span></span>
+<span id="cb33-4"><a href="#cb33-4"></a></span>
+<span id="cb33-5"><a href="#cb33-5"></a>states <span class="op">=</span> (<span class="st">'lluvia'</span>, <span class="st">'no_lluvia'</span>)</span>
+<span id="cb33-6"><a href="#cb33-6"></a>observations <span class="op">=</span> (<span class="st">'paraguas'</span>, <span class="st">'no_paraguas'</span>)</span>
+<span id="cb33-7"><a href="#cb33-7"></a></span>
+<span id="cb33-8"><a href="#cb33-8"></a>start_probability <span class="op">=</span> {<span class="st">'lluvia'</span>: <span class="fl">0.5</span>, <span class="st">'no_lluvia'</span>: <span class="fl">0.5</span>} <span class="co"># Vector de información a priori</span></span>
+<span id="cb33-9"><a href="#cb33-9"></a></span>
+<span id="cb33-10"><a href="#cb33-10"></a><span class="co"># Matrices de probabilidad entre estados </span></span>
+<span id="cb33-11"><a href="#cb33-11"></a>transition_probability <span class="op">=</span> {</span>
+<span id="cb33-12"><a href="#cb33-12"></a>    <span class="st">'lluvia'</span>: {<span class="st">'lluvia'</span>: <span class="fl">0.7</span>, <span class="st">'no_lluvia'</span>: <span class="fl">0.3</span>},</span>
+<span id="cb33-13"><a href="#cb33-13"></a>    <span class="st">'no_lluvia'</span>: {<span class="st">'lluvia'</span>: <span class="fl">0.3</span>, <span class="st">'no_lluvia'</span>: <span class="fl">0.7</span>},</span>
+<span id="cb33-14"><a href="#cb33-14"></a>}</span>
+<span id="cb33-15"><a href="#cb33-15"></a></span>
+<span id="cb33-16"><a href="#cb33-16"></a><span class="co"># Matriz de probabilidad de observables </span></span>
+<span id="cb33-17"><a href="#cb33-17"></a>emission_probability <span class="op">=</span> {</span>
+<span id="cb33-18"><a href="#cb33-18"></a>    <span class="st">'lluvia'</span>: {<span class="st">'paraguas'</span>: <span class="fl">0.9</span>, <span class="st">'no_paraguas'</span>: <span class="fl">0.1</span>},</span>
+<span id="cb33-19"><a href="#cb33-19"></a>    <span class="st">'no_lluvia'</span>: {<span class="st">'paraguas'</span>: <span class="fl">0.2</span>, <span class="st">'no_paraguas'</span>: <span class="fl">0.8</span>},</span>
+<span id="cb33-20"><a href="#cb33-20"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="filtrado" class="level4" data-number="2.3.3.1">
+<h4 data-number="2.3.3.1" class="anchored" data-anchor-id="filtrado"><span class="header-section-number">2.3.3.1</span> Filtrado</h4>
+<section id="implementación-del-algoritmo-forward" class="level5" data-number="2.3.3.1.1">
+<h5 data-number="2.3.3.1.1" class="anchored" data-anchor-id="implementación-del-algoritmo-forward"><span class="header-section-number">2.3.3.1.1</span> Implementación del Algoritmo Forward</h5>
+<p>Se define la función para calcular la probabilidad conjunta de una secuencia de observaciones y estados usando el <code>algoritmo de avance (forward)</code>.</p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1"></a><span class="kw">def</span> forward(obs, states, start_p, trans_p, emit_p):</span>
+<span id="cb34-2"><a href="#cb34-2"></a>    alpha <span class="op">=</span> np.zeros((<span class="bu">len</span>(obs), <span class="bu">len</span>(states)))</span>
+<span id="cb34-3"><a href="#cb34-3"></a></span>
+<span id="cb34-4"><a href="#cb34-4"></a>    <span class="co"># Inicializar primer paso</span></span>
+<span id="cb34-5"><a href="#cb34-5"></a>    <span class="cf">for</span> i, state <span class="kw">in</span> <span class="bu">enumerate</span>(states):</span>
+<span id="cb34-6"><a href="#cb34-6"></a>        alpha[<span class="dv">0</span>][i] <span class="op">=</span> start_p[state] <span class="op">*</span> emit_p[state][obs[<span class="dv">0</span>]]</span>
+<span id="cb34-7"><a href="#cb34-7"></a></span>
+<span id="cb34-8"><a href="#cb34-8"></a>    <span class="co"># Recorrer el resto de la secuencia de observaciones</span></span>
+<span id="cb34-9"><a href="#cb34-9"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(obs)):</span>
+<span id="cb34-10"><a href="#cb34-10"></a>        <span class="cf">for</span> i, current_state <span class="kw">in</span> <span class="bu">enumerate</span>(states):</span>
+<span id="cb34-11"><a href="#cb34-11"></a>            alpha[t][i] <span class="op">=</span> <span class="bu">sum</span>(alpha[t<span class="op">-</span><span class="dv">1</span>][j] <span class="op">*</span> trans_p[states[j]][current_state] <span class="op">*</span> emit_p[current_state][obs[t]] <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(states)))</span>
+<span id="cb34-12"><a href="#cb34-12"></a></span>
+<span id="cb34-13"><a href="#cb34-13"></a>    <span class="cf">return</span> alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb35"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1"></a><span class="co"># Secuencia de observaciones y estados de los tres primeros días</span></span>
+<span id="cb35-2"><a href="#cb35-2"></a>observations_sequence <span class="op">=</span> [<span class="st">'paraguas'</span>, <span class="st">'paraguas'</span>, <span class="st">'no_paraguas'</span>]</span>
+<span id="cb35-3"><a href="#cb35-3"></a></span>
+<span id="cb35-4"><a href="#cb35-4"></a><span class="co"># Calcula la probabilidad conjunta de la secuencia de observaciones y estados usando el algoritmo de avance</span></span>
+<span id="cb35-5"><a href="#cb35-5"></a>alpha <span class="op">=</span> forward(observations_sequence, states, start_probability, transition_probability, emission_probability)</span>
+<span id="cb35-6"><a href="#cb35-6"></a>alpha</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb36"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1"></a><span class="co"># Suma de las probabilidades en el último paso para obtener la probabilidad total de la secuencia de observaciones</span></span>
+<span id="cb36-2"><a href="#cb36-2"></a>probability_sequence <span class="op">=</span> np.<span class="bu">sum</span>(alpha[<span class="op">-</span><span class="dv">1</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1"></a>alpha[<span class="op">-</span><span class="dv">1</span>] <span class="op">/</span> probability_sequence <span class="co"># Probabilidad normalizada en el último paso (día 3)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Así, la probabilidad de que el día 3 sea lluvia es del 19%</p>
+</section>
+</section>
+<section id="explicación-más-verosimil" class="level4" data-number="2.3.3.2">
+<h4 data-number="2.3.3.2" class="anchored" data-anchor-id="explicación-más-verosimil"><span class="header-section-number">2.3.3.2</span> Explicación más verosimil</h4>
+<section id="implementación-del-algoritmo-viterbi" class="level5" data-number="2.3.3.2.1">
+<h5 data-number="2.3.3.2.1" class="anchored" data-anchor-id="implementación-del-algoritmo-viterbi"><span class="header-section-number">2.3.3.2.1</span> Implementación del algoritmo Viterbi</h5>
+<p>Función para calcular la secuencia de estados más probable utilizando el algoritmo Viterbi</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1"></a><span class="kw">def</span> viterbi(obs, states, start_p, trans_p, emit_p):</span>
+<span id="cb38-2"><a href="#cb38-2"></a>    V <span class="op">=</span> [{}]</span>
+<span id="cb38-3"><a href="#cb38-3"></a>    path <span class="op">=</span> {}</span>
+<span id="cb38-4"><a href="#cb38-4"></a></span>
+<span id="cb38-5"><a href="#cb38-5"></a>    <span class="co"># Inicializar primer paso</span></span>
+<span id="cb38-6"><a href="#cb38-6"></a>    <span class="cf">for</span> state <span class="kw">in</span> states:</span>
+<span id="cb38-7"><a href="#cb38-7"></a>        V[<span class="dv">0</span>][state] <span class="op">=</span> start_p[state] <span class="op">*</span> emit_p[state][obs[<span class="dv">0</span>]]</span>
+<span id="cb38-8"><a href="#cb38-8"></a>        path[state] <span class="op">=</span> [state]</span>
+<span id="cb38-9"><a href="#cb38-9"></a></span>
+<span id="cb38-10"><a href="#cb38-10"></a>    <span class="co"># Recorrer el resto de la secuencia de observaciones</span></span>
+<span id="cb38-11"><a href="#cb38-11"></a>    <span class="cf">for</span> t <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, <span class="bu">len</span>(obs)):</span>
+<span id="cb38-12"><a href="#cb38-12"></a>        V.append({})</span>
+<span id="cb38-13"><a href="#cb38-13"></a>        new_path <span class="op">=</span> {}</span>
+<span id="cb38-14"><a href="#cb38-14"></a></span>
+<span id="cb38-15"><a href="#cb38-15"></a>        <span class="cf">for</span> current_state <span class="kw">in</span> states:</span>
+<span id="cb38-16"><a href="#cb38-16"></a>            (prob, state) <span class="op">=</span> <span class="bu">max</span>(</span>
+<span id="cb38-17"><a href="#cb38-17"></a>                (V[t <span class="op">-</span> <span class="dv">1</span>][previous_state] <span class="op">*</span> trans_p[previous_state][current_state] <span class="op">*</span> emit_p[current_state][obs[t]], previous_state)</span>
+<span id="cb38-18"><a href="#cb38-18"></a>                <span class="cf">for</span> previous_state <span class="kw">in</span> states</span>
+<span id="cb38-19"><a href="#cb38-19"></a>            )</span>
+<span id="cb38-20"><a href="#cb38-20"></a>            V[t][current_state] <span class="op">=</span> prob</span>
+<span id="cb38-21"><a href="#cb38-21"></a>            new_path[current_state] <span class="op">=</span> path[state] <span class="op">+</span> [current_state]</span>
+<span id="cb38-22"><a href="#cb38-22"></a></span>
+<span id="cb38-23"><a href="#cb38-23"></a>        path <span class="op">=</span> new_path</span>
+<span id="cb38-24"><a href="#cb38-24"></a></span>
+<span id="cb38-25"><a href="#cb38-25"></a>    <span class="co"># Encontrar el estado final con la mayor probabilidad</span></span>
+<span id="cb38-26"><a href="#cb38-26"></a>    (prob, state) <span class="op">=</span> <span class="bu">max</span>((V[<span class="bu">len</span>(obs) <span class="op">-</span> <span class="dv">1</span>][final_state], final_state) <span class="cf">for</span> final_state <span class="kw">in</span> states)</span>
+<span id="cb38-27"><a href="#cb38-27"></a></span>
+<span id="cb38-28"><a href="#cb38-28"></a>    <span class="cf">return</span> (prob, path[state])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Se aplica la función y se obtiene tanto la secuencia de estados ocultosmás probable como la probabilidad de ésta.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1"></a>prob, path <span class="op">=</span> viterbi(observations_sequence, states, start_probability, transition_probability, emission_probability)</span>
+<span id="cb39-2"><a href="#cb39-2"></a><span class="bu">print</span>(<span class="ss">f"Secuencia de estados ocultos más probable: </span><span class="sc">{</span>path<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb39-3"><a href="#cb39-3"></a><span class="bu">print</span>(<span class="ss">f"Probabilidad de la secuencia más probable: </span><span class="sc">{</span>prob<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="aplicación-de-un-hmm-post-tagging" class="level4" data-number="2.3.3.3">
+<h4 data-number="2.3.3.3" class="anchored" data-anchor-id="aplicación-de-un-hmm-post-tagging"><span class="header-section-number">2.3.3.3</span> Aplicación de un HMM: Post-tagging</h4>
+<p>El <strong>post-tagging</strong> es una tarea fundamental en el procesamiento del lenguaje natural (<code>NLP</code> por sus siglas en inglés) que consiste en asignar etiquetas gramaticales a cada palabra en una oración después de haber sido segmentada en palabras individuales. Esta tarea es crucial para comprender el significado y la estructura de las oraciones, ya que las etiquetas gramaticales proporcionan información sobre la función sintáctica de cada palabra.</p>
+<p>En el contexto del post-tagging, los estados del HMM representan las etiquetas gramaticales de las palabras, las transiciones representan la dependencia entre las etiquetas gramaticales de las palabras consecutivas y las emisiones representan la probabilidad de que una palabra dada se observe en un estado determinado.</p>
+<p>Para realizar el post-tagging con un HMM, se sigue el siguiente procedimiento:</p>
+<ul>
+<li><p><em>Entrenamiento del modelo</em>: se entrena con un conjunto de datos de oraciones etiquetadas, aprendiendo las probabilidades de transición y emisión</p></li>
+<li><p><em>Predicción de etiquetas</em>: para una nueva oración sin etiquetar, el modelo predice la secuencia de etiquetas gramaticales más probable para la oración, utilizando el algoritmo de Viterbi</p></li>
+</ul>
+<p><strong>Ventajas</strong></p>
+<ul>
+<li><em>Flexibilidad</em>: pueden modelar secuencias de palabras con diferentes patrones gramaticales</li>
+</ul>
+<p>Interpretabilidad: Los estados del HMM pueden interpretarse como diferentes tipos de palabras o estructuras gramaticales.</p>
+<p>Robustez: Los HMMs son robustos a errores de segmentación de palabras y a palabras desconocidas.</p>
+<p><strong>Limitaciones</strong></p>
+<ul>
+<li><p><em>Dependencia de datos</em>: el rendimiento del modelo depende de la calidad y cantidad de datos de entrenamiento disponibles</p></li>
+<li><p><em>Ambigüedad gramatical</em>: pueden no ser capaces de resolver ambigüedades gramaticales en oraciones complejas</p></li>
+<li><p><em>Necesidad de preprocesamiento</em>: requiere preprocesamiento previo de las oraciones, como la segmentación de palabras.</p></li>
+</ul>
+<div class="sourceCode" id="cb40"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1"></a><span class="im">import</span> warnings</span>
+<span id="cb40-2"><a href="#cb40-2"></a></span>
+<span id="cb40-3"><a href="#cb40-3"></a><span class="im">import</span> nltk</span>
+<span id="cb40-4"><a href="#cb40-4"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb40-5"><a href="#cb40-5"></a><span class="im">from</span> hmmlearn <span class="im">import</span> hmm</span>
+<span id="cb40-6"><a href="#cb40-6"></a></span>
+<span id="cb40-7"><a href="#cb40-7"></a>warnings.filterwarnings(<span class="st">"ignore"</span>)</span>
+<span id="cb40-8"><a href="#cb40-8"></a></span>
+<span id="cb40-9"><a href="#cb40-9"></a><span class="im">from</span> nltk.corpus <span class="im">import</span> brown <span class="co"># corpus con etiquetado</span></span>
+<span id="cb40-10"><a href="#cb40-10"></a></span>
+<span id="cb40-11"><a href="#cb40-11"></a><span class="co"># Cargar las sentencias etiquetadas del corpus brown</span></span>
+<span id="cb40-12"><a href="#cb40-12"></a>tagged_sentences <span class="op">=</span> brown.tagged_sents(tagset<span class="op">=</span><span class="st">'english'</span>)</span>
+<span id="cb40-13"><a href="#cb40-13"></a></span>
+<span id="cb40-14"><a href="#cb40-14"></a><span class="co"># Crear un diccionario de palabras y un diccionario de etiquetas</span></span>
+<span id="cb40-15"><a href="#cb40-15"></a>word2idx <span class="op">=</span> {}</span>
+<span id="cb40-16"><a href="#cb40-16"></a>tag2idx <span class="op">=</span> {}</span>
+<span id="cb40-17"><a href="#cb40-17"></a></span>
+<span id="cb40-18"><a href="#cb40-18"></a><span class="co"># Iterar sobre las sentencias etiquetadas para construir los diccionarios</span></span>
+<span id="cb40-19"><a href="#cb40-19"></a><span class="cf">for</span> sentence <span class="kw">in</span> tagged_sentences:</span>
+<span id="cb40-20"><a href="#cb40-20"></a>    <span class="cf">for</span> word, tag <span class="kw">in</span> sentence:</span>
+<span id="cb40-21"><a href="#cb40-21"></a>        <span class="cf">if</span> word.lower() <span class="kw">not</span> <span class="kw">in</span> word2idx:</span>
+<span id="cb40-22"><a href="#cb40-22"></a>            word2idx[word.lower()] <span class="op">=</span> <span class="bu">len</span>(word2idx)</span>
+<span id="cb40-23"><a href="#cb40-23"></a>        <span class="cf">if</span> tag <span class="kw">not</span> <span class="kw">in</span> tag2idx:</span>
+<span id="cb40-24"><a href="#cb40-24"></a>            tag2idx[tag] <span class="op">=</span> <span class="bu">len</span>(tag2idx)</span>
+<span id="cb40-25"><a href="#cb40-25"></a></span>
+<span id="cb40-26"><a href="#cb40-26"></a><span class="co"># Estos diccionarios serán útiles para convertir palabras y tags en índices numéricos que nuestro modelo HMM pueda entender.</span></span>
+<span id="cb40-27"><a href="#cb40-27"></a></span>
+<span id="cb40-28"><a href="#cb40-28"></a><span class="co"># Conjunto de entrenamiento</span></span>
+<span id="cb40-29"><a href="#cb40-29"></a>words_train <span class="op">=</span> [] <span class="co"># Lista de palabras (en minúscualas por lower)  </span></span>
+<span id="cb40-30"><a href="#cb40-30"></a>tags_train <span class="op">=</span> [] <span class="co"># Lista de etiquetas</span></span>
+<span id="cb40-31"><a href="#cb40-31"></a><span class="cf">for</span> sentence <span class="kw">in</span> tagged_sentences:</span>
+<span id="cb40-32"><a href="#cb40-32"></a>    words, tags <span class="op">=</span> <span class="bu">zip</span>(<span class="op">*</span>sentence)</span>
+<span id="cb40-33"><a href="#cb40-33"></a>    words_train.append([word.lower() <span class="cf">for</span> word <span class="kw">in</span> words])</span>
+<span id="cb40-34"><a href="#cb40-34"></a>    tags_train.append(tags)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb41"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1"></a><span class="co"># Creación y entrenamiento del modelo HMM</span></span>
+<span id="cb41-2"><a href="#cb41-2"></a>model <span class="op">=</span> hmm.MultinomialHMM(n_components<span class="op">=</span><span class="bu">len</span>(tag2idx), init_params<span class="op">=</span><span class="st">"ste"</span>) <span class="co"># estados ocultos como número de etiquetas</span></span>
+<span id="cb41-3"><a href="#cb41-3"></a>model.fit(</span>
+<span id="cb41-4"><a href="#cb41-4"></a>    X<span class="op">=</span>np.array([word2idx[word] <span class="cf">for</span> words <span class="kw">in</span> words_train <span class="cf">for</span> word <span class="kw">in</span> words]).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>),</span>
+<span id="cb41-5"><a href="#cb41-5"></a>    lengths<span class="op">=</span>[<span class="bu">len</span>(words) <span class="cf">for</span> words <span class="kw">in</span> words_train]</span>
+<span id="cb41-6"><a href="#cb41-6"></a>) <span class="co"># El entrenamiento se hace converiendo a índices las palabras</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb42"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1"></a><span class="co"># Función para realizar post-tagging en una nueva sentencia en castellano</span></span>
+<span id="cb42-2"><a href="#cb42-2"></a><span class="kw">def</span> post_tag(model, sentence, word2idx, tag2idx):</span>
+<span id="cb42-3"><a href="#cb42-3"></a>    </span>
+<span id="cb42-4"><a href="#cb42-4"></a>    <span class="co"># Convertir las palabras de la sentencia a índices</span></span>
+<span id="cb42-5"><a href="#cb42-5"></a>    word_idxs <span class="op">=</span> [word2idx[word.lower()] <span class="cf">for</span> word <span class="kw">in</span> sentence <span class="cf">if</span> word.lower() <span class="kw">in</span> word2idx]</span>
+<span id="cb42-6"><a href="#cb42-6"></a>    </span>
+<span id="cb42-7"><a href="#cb42-7"></a>    <span class="co"># Si no hay palabras conocidas, devolver None</span></span>
+<span id="cb42-8"><a href="#cb42-8"></a>    <span class="cf">if</span> <span class="bu">len</span>(word_idxs) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb42-9"><a href="#cb42-9"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb42-10"><a href="#cb42-10"></a>    </span>
+<span id="cb42-11"><a href="#cb42-11"></a>    <span class="co"># Realizar post-tagging utilizando el modelo HMM</span></span>
+<span id="cb42-12"><a href="#cb42-12"></a>    predicted_tags <span class="op">=</span> model.predict(np.array(word_idxs).reshape(<span class="op">-</span><span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb42-13"><a href="#cb42-13"></a>    </span>
+<span id="cb42-14"><a href="#cb42-14"></a>    <span class="co"># Convertir los índices de etiquetas a etiquetas POS</span></span>
+<span id="cb42-15"><a href="#cb42-15"></a>    predicted_tags <span class="op">=</span> [<span class="bu">list</span>(tag2idx.keys())[<span class="bu">list</span>(tag2idx.values()).index(tag)] <span class="cf">for</span> tag <span class="kw">in</span> predicted_tags]</span>
+<span id="cb42-16"><a href="#cb42-16"></a>    </span>
+<span id="cb42-17"><a href="#cb42-17"></a>    <span class="cf">return</span> <span class="bu">list</span>(<span class="bu">zip</span>(sentence, predicted_tags))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode" id="cb43"><pre class="sourceCode numberSource python number-lines code-with-copy"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1"></a>sentence <span class="op">=</span> <span class="st">"I love Python"</span></span>
+<span id="cb43-2"><a href="#cb43-2"></a>predicted_tags <span class="op">=</span> post_tag(model, sentence.split(), word2idx, tag2idx)</span>
+<span id="cb43-3"><a href="#cb43-3"></a><span class="bu">print</span>(<span class="ss">f"Post-tagging de la oración: </span><span class="sc">{</span>predicted_tags<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+    const config = {
+      allowHTML: true,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start',
+    };
+    if (contentFn) {
+      config.content = contentFn;
+    }
+    if (onTriggerFn) {
+      config.onTrigger = onTriggerFn;
+    }
+    if (onUntriggerFn) {
+      config.onUntrigger = onUntriggerFn;
+    }
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const xrefs = window.document.querySelectorAll('a.quarto-xref');
+  const processXRef = (id, note) => {
+    // Strip column container classes
+    const stripColumnClz = (el) => {
+      el.classList.remove("page-full", "page-columns");
+      if (el.children) {
+        for (const child of el.children) {
+          stripColumnClz(child);
+        }
+      }
+    }
+    stripColumnClz(note)
+    if (id === null || id.startsWith('sec-')) {
+      // Special case sections, only their first couple elements
+      const container = document.createElement("div");
+      if (note.children && note.children.length > 2) {
+        container.appendChild(note.children[0].cloneNode(true));
+        for (let i = 1; i < note.children.length; i++) {
+          const child = note.children[i];
+          if (child.tagName === "P" && child.innerText === "") {
+            continue;
+          } else {
+            container.appendChild(child.cloneNode(true));
+            break;
+          }
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(container);
+        }
+        return container.innerHTML
+      } else {
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        return note.innerHTML;
+      }
+    } else {
+      // Remove any anchor links if they are present
+      const anchorLink = note.querySelector('a.anchorjs-link');
+      if (anchorLink) {
+        anchorLink.remove();
+      }
+      if (window.Quarto?.typesetMath) {
+        window.Quarto.typesetMath(note);
+      }
+      // TODO in 1.5, we should make sure this works without a callout special case
+      if (note.classList.contains("callout")) {
+        return note.outerHTML;
+      } else {
+        return note.innerHTML;
+      }
+    }
+  }
+  for (var i=0; i<xrefs.length; i++) {
+    const xref = xrefs[i];
+    tippyHover(xref, undefined, function(instance) {
+      instance.disable();
+      let url = xref.getAttribute('href');
+      let hash = undefined; 
+      if (url.startsWith('#')) {
+        hash = url;
+      } else {
+        try { hash = new URL(url).hash; } catch {}
+      }
+      if (hash) {
+        const id = hash.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note !== null) {
+          try {
+            const html = processXRef(id, note.cloneNode(true));
+            instance.setContent(html);
+          } finally {
+            instance.enable();
+            instance.show();
+          }
+        } else {
+          // See if we can fetch this
+          fetch(url.split('#')[0])
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.getElementById(id);
+            if (note !== null) {
+              const html = processXRef(id, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      } else {
+        // See if we can fetch a full url (with no hash to target)
+        // This is a special case and we should probably do some content thinning / targeting
+        fetch(url)
+        .then(res => res.text())
+        .then(html => {
+          const parser = new DOMParser();
+          const htmlDoc = parser.parseFromString(html, "text/html");
+          const note = htmlDoc.querySelector('main.content');
+          if (note !== null) {
+            // This should only happen for chapter cross references
+            // (since there is no id in the URL)
+            // remove the first header
+            if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+              note.children[0].remove();
+            }
+            const html = processXRef(null, note);
+            instance.setContent(html);
+          } 
+        }).finally(() => {
+          instance.enable();
+          instance.show();
+        });
+      }
+    }, function(instance) {
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            div.style.left = 0;
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+        // Handle positioning of the toggle
+    window.addEventListener(
+      "resize",
+      throttle(() => {
+        elRect = undefined;
+        if (selectedAnnoteEl) {
+          selectCodeLines(selectedAnnoteEl);
+        }
+      }, 10)
+    );
+    function throttle(fn, ms) {
+    let throttle = false;
+    let timer;
+      return (...args) => {
+        if(!throttle) { // first call gets through
+            fn.apply(this, args);
+            throttle = true;
+        } else { // all the others get throttled
+            if(timer) clearTimeout(timer); // cancel #2
+            timer = setTimeout(() => {
+              fn.apply(this, args);
+              timer = throttle = false;
+            }, ms);
+        }
+      };
+    }
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./capitulo1.html" class="pagination-link" aria-label="Deep Learning">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Deep Learning</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./capitulo3.html" class="pagination-link" aria-label="Algoritmos Genéticos">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Algoritmos Genéticos</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

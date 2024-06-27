@@ -1,0 +1,112 @@
+\contentsline {chapter}{Introducción}{5}{chapter*.2}%
+\contentsline {chapter}{\numberline {1}Deep Learning}{6}{chapter.1}%
+\contentsline {section}{\numberline {1.1}Introducción}{6}{section.1.1}%
+\contentsline {section}{\numberline {1.2}Principales arquitecturas y software de Deep Learning}{7}{section.1.2}%
+\contentsline {subsection}{\numberline {1.2.1}Principales arquitecturas}{7}{subsection.1.2.1}%
+\contentsline {subsection}{\numberline {1.2.2}Software}{10}{subsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.2.1}Google Colab}{12}{subsubsection.1.2.2.1}%
+\contentsline {section}{\numberline {1.3}Conceptos básicos de las Redes Neuronales}{16}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Datos}{18}{subsection.1.3.1}%
+\contentsline {subsection}{\numberline {1.3.2}Arquitectura de red}{19}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}Función de coste y pérdida}{19}{subsection.1.3.3}%
+\contentsline {subsection}{\numberline {1.3.4}Optimizador}{21}{subsection.1.3.4}%
+\contentsline {subsection}{\numberline {1.3.5}Función de activación}{24}{subsection.1.3.5}%
+\contentsline {subsection}{\numberline {1.3.6}Regularización}{25}{subsection.1.3.6}%
+\contentsline {subsection}{\numberline {1.3.7}Dropout}{25}{subsection.1.3.7}%
+\contentsline {subsection}{\numberline {1.3.8}Dropconnect}{26}{subsection.1.3.8}%
+\contentsline {subsection}{\numberline {1.3.9}Inicialización de pesos}{26}{subsection.1.3.9}%
+\contentsline {subsection}{\numberline {1.3.10}Batch normalization}{26}{subsection.1.3.10}%
+\contentsline {subsection}{\numberline {1.3.11}Ejemplo de Red Neuronal con Keras}{27}{subsection.1.3.11}%
+\contentsline {section}{\numberline {1.4}Redes Neuronales Convolucionales}{28}{section.1.4}%
+\contentsline {subsection}{\numberline {1.4.1}Introducción}{28}{subsection.1.4.1}%
+\contentsline {subsection}{\numberline {1.4.2}Clasificación de imágenes}{29}{subsection.1.4.2}%
+\contentsline {subsubsection}{\numberline {1.4.2.1}Convolución}{31}{subsubsection.1.4.2.1}%
+\contentsline {subsubsection}{\numberline {1.4.2.2}Pooling}{33}{subsubsection.1.4.2.2}%
+\contentsline {subsubsection}{\numberline {1.4.2.3}Padding}{34}{subsubsection.1.4.2.3}%
+\contentsline {subsubsection}{\numberline {1.4.2.4}Stride}{36}{subsubsection.1.4.2.4}%
+\contentsline {subsubsection}{\numberline {1.4.2.5}Redes convolucionales con nombre propio}{36}{subsubsection.1.4.2.5}%
+\contentsline {subsubsection}{\numberline {1.4.2.6}Ejemplos de Redes Convolucionales con keras}{38}{subsubsection.1.4.2.6}%
+\contentsline {subsection}{\numberline {1.4.3}Clasificación de textos}{43}{subsection.1.4.3}%
+\contentsline {section}{\numberline {1.5}Redes Recurrentes}{48}{section.1.5}%
+\contentsline {section}{\numberline {1.6}Redes recurrentes: Elman, Jordan, LSTM y GRU}{48}{section.1.6}%
+\contentsline {subsection}{\numberline {1.6.1}Forecasting en series de tiempo}{48}{subsection.1.6.1}%
+\contentsline {subsection}{\numberline {1.6.2}Clasificación y generación de textos}{48}{subsection.1.6.2}%
+\contentsline {section}{\numberline {1.7}Autoencoders}{48}{section.1.7}%
+\contentsline {subsection}{\numberline {1.7.1}Bases del Autoencoder}{48}{subsection.1.7.1}%
+\contentsline {subsection}{\numberline {1.7.2}Idea intuitiva del uso de Autoencoders}{50}{subsection.1.7.2}%
+\contentsline {subsection}{\numberline {1.7.3}Casos de uso}{51}{subsection.1.7.3}%
+\contentsline {subsection}{\numberline {1.7.4}Diseño del modelo de AE}{53}{subsection.1.7.4}%
+\contentsline {subsection}{\numberline {1.7.5}Ejemplos de Autoencoders}{54}{subsection.1.7.5}%
+\contentsline {section}{\numberline {1.8}Arquitecturas preentrenadas}{61}{section.1.8}%
+\contentsline {subsection}{\numberline {1.8.1}Paquetes específicos en Python}{63}{subsection.1.8.1}%
+\contentsline {subsubsection}{\numberline {1.8.1.1}Transformers}{63}{subsubsection.1.8.1.1}%
+\contentsline {subsection}{\numberline {1.8.2}Tensorflow-Hub}{63}{subsection.1.8.2}%
+\contentsline {subsection}{\numberline {1.8.3}Arquitecturas Zero-shot}{63}{subsection.1.8.3}%
+\contentsline {subsubsection}{\numberline {1.8.3.1}Uso en imágenes}{63}{subsubsection.1.8.3.1}%
+\contentsline {subsubsection}{\numberline {1.8.3.2}Uso en texto}{64}{subsubsection.1.8.3.2}%
+\contentsline {subsection}{\numberline {1.8.4}Detección de objetos}{64}{subsection.1.8.4}%
+\contentsline {subsection}{\numberline {1.8.5}Conversión de voz a texto}{64}{subsection.1.8.5}%
+\contentsline {section}{\numberline {1.9}Aprendizaje por Refuerzo}{64}{section.1.9}%
+\contentsline {subsection}{\numberline {1.9.1}Introducción}{64}{subsection.1.9.1}%
+\contentsline {subsection}{\numberline {1.9.2}Formalismo Matemático}{65}{subsection.1.9.2}%
+\contentsline {subsubsection}{\numberline {1.9.2.1}Propiedad de Markov}{65}{subsubsection.1.9.2.1}%
+\contentsline {subsubsection}{\numberline {1.9.2.2}Proceso de Markov}{66}{subsubsection.1.9.2.2}%
+\contentsline {subsubsection}{\numberline {1.9.2.3}Proceso de Recompensa de Markov}{66}{subsubsection.1.9.2.3}%
+\contentsline {subsubsection}{\numberline {1.9.2.4}Proceso de Decisión de Markov}{67}{subsubsection.1.9.2.4}%
+\contentsline {subsubsection}{\numberline {1.9.2.5}Resolución de las Ecuaciones de Bellman}{69}{subsubsection.1.9.2.5}%
+\contentsline {subsection}{\numberline {1.9.3}Taxonomía de Algoritmos}{69}{subsection.1.9.3}%
+\contentsline {subsection}{\numberline {1.9.4}Q-Learning (value)}{71}{subsection.1.9.4}%
+\contentsline {subsection}{\numberline {1.9.5}DQN (Deep Q-Learning)}{72}{subsection.1.9.5}%
+\contentsline {subsection}{\numberline {1.9.6}Listado Algoritmos}{75}{subsection.1.9.6}%
+\contentsline {chapter}{\numberline {2}Modelos Gráficos Probabilísticos y Análisis Causal}{80}{chapter.2}%
+\contentsline {section}{\numberline {2.1}Redes Bayesianas}{80}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Modelo Naive Bayes: Hipótesis Map y Teorema de Bayes}{81}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Modelo Naive-Bayes}{84}{subsection.2.1.2}%
+\contentsline {subsubsection}{\numberline {2.1.2.1}Bernoulli Naive Bayes}{86}{subsubsection.2.1.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.2.2}Gaussian Naive Bayes}{87}{subsubsection.2.1.2.2}%
+\contentsline {section}{\numberline {2.2}Modelos Bayesianos}{89}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Formulación general}{89}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Independencia condicional e inferencia de la red}{90}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Aprendizaje de las redes bayesianas}{91}{subsection.2.2.3}%
+\contentsline {subsection}{\numberline {2.2.4}Clasificadores}{93}{subsection.2.2.4}%
+\contentsline {section}{\numberline {2.3}Modelos Ocultos de Markov}{97}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Cadenas de Markov}{97}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Cadena de Markov absorvente}{99}{subsection.2.3.2}%
+\contentsline {subsection}{\numberline {2.3.3}Modelos Ocultos de Markov}{103}{subsection.2.3.3}%
+\contentsline {subsubsection}{\numberline {2.3.3.1}Filtrado}{106}{subsubsection.2.3.3.1}%
+\contentsline {paragraph}{\numberline {2.3.3.1.1}Implementación del Algoritmo Forward}{106}{paragraph.2.3.3.1.1}%
+\contentsline {subsubsection}{\numberline {2.3.3.2}Explicación más verosimil}{107}{subsubsection.2.3.3.2}%
+\contentsline {paragraph}{\numberline {2.3.3.2.1}Implementación del algoritmo Viterbi}{107}{paragraph.2.3.3.2.1}%
+\contentsline {subsubsection}{\numberline {2.3.3.3}Aplicación de un HMM: Post-tagging}{108}{subsubsection.2.3.3.3}%
+\contentsline {chapter}{\numberline {3}Algoritmos Genéticos}{111}{chapter.3}%
+\contentsline {section}{\numberline {3.1}Introducción}{111}{section.3.1}%
+\contentsline {section}{\numberline {3.2}Fundamentos teóricos}{112}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Codificación de los datos}{113}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Algoritmo}{114}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Otros Operadores}{118}{subsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.2.4}Parámetros necesarios al aplicar Algoritmos Genéticos}{118}{subsection.3.2.4}%
+\contentsline {section}{\numberline {3.3}Casos de uso}{119}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Selección de Variable}{120}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Entrenamiento de Red Neuronal}{122}{subsection.3.3.2}%
+\contentsline {subsection}{\numberline {3.3.3}Arquitecura de RedNeuronal}{123}{subsection.3.3.3}%
+\contentsline {section}{\numberline {3.4}Algoritmos genéticos con R}{125}{section.3.4}%
+\contentsline {subsection}{\numberline {3.4.1}Paquetes para usar en R}{125}{subsection.3.4.1}%
+\contentsline {subsection}{\numberline {3.4.2}Selección de variables}{125}{subsection.3.4.2}%
+\contentsline {subsection}{\numberline {3.4.3}Entrenamiento de Red Neuronal}{125}{subsection.3.4.3}%
+\contentsline {section}{\numberline {3.5}Algoritmos genéticos en Python}{125}{section.3.5}%
+\contentsline {subsection}{\numberline {3.5.1}Paquetes para usar en Python}{125}{subsection.3.5.1}%
+\contentsline {subsection}{\numberline {3.5.2}Optimiación de funciones}{125}{subsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.5.3}Entrenamiento de Red Neuronal}{125}{subsection.3.5.3}%
+\contentsline {chapter}{\numberline {4}Lógica Difusa}{128}{chapter.4}%
+\contentsline {section}{\numberline {4.1}Contexto y conceptos clave}{128}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Operaciones sobre conjuntos difusos}{129}{subsection.4.1.1}%
+\contentsline {subsubsection}{\numberline {4.1.1.1}T-normas y T-conormas}{130}{subsubsection.4.1.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Funciones de membresía y modelamiento difuso}{132}{subsection.4.1.2}%
+\contentsline {subsubsection}{\numberline {4.1.2.1}Funciones de membresía}{132}{subsubsection.4.1.2.1}%
+\contentsline {subsubsection}{\numberline {4.1.2.2}Modelado difuso}{133}{subsubsection.4.1.2.2}%
+\contentsline {section}{\numberline {4.2}Ejemplos prácticos}{135}{section.4.2}%
+\contentsline {section}{\numberline {4.3}Fuzzy C-Means}{137}{section.4.3}%
+\contentsline {section}{\numberline {4.4}Fuzzy Matching}{138}{section.4.4}%
+\contentsline {subsection}{\numberline {4.4.1}Ejemplo 1}{139}{subsection.4.4.1}%
+\contentsline {subsection}{\numberline {4.4.2}Ejemplo 2}{139}{subsection.4.4.2}%
+\providecommand \tocbasic@end@toc@file {}\tocbasic@end@toc@file 

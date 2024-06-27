@@ -1,0 +1,4 @@
+# Introducción {.unnumbered}
+
+
+![Diagrama Conceptual](imagenes/diagrama_conceptual.png){#fig-diagrama-conceptual width="100%"}
