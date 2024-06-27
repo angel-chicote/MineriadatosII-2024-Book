@@ -17,10 +17,10 @@ book:
   
   chapters:
     - index.qmd
-    - capitulo1.qmd # Deep learning
+    #- capitulo1.qmd # Deep learning
     - capitulo2.qmd # Bayes Análisis causal
-    - capitulo3.qmd # Genéticos
-    - capitulo4.qmd # Lógica Difusa
+    #- capitulo3.qmd # Genéticos
+    #- capitulo4.qmd # Lógica Difusa
     #- references.qmd
   #appendices:
   #  - anexo1.qmd
@@ -72,10 +72,11 @@ format:
 
         \usepackage{makeidx}
         \makeindex
-        
+         
         % Poner el texto adecuado por delante
-        \renewcommand{\figurename}{Imagen}
-        \renewcommand{\tablename}{Tabla}
+        \renewcommand{\figurename}{Imagen} 
+        \renewcommand{\tablename}{Tabla}  
+        \renewcommand{\E}{\mathbb{E}} 
         
 
         % Formatear el Capitulo, sección y subsección
